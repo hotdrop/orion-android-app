@@ -1,6 +1,6 @@
 # ORION Design Document
 
-- ステータス: 完成版の概要設計
+- ステータス: 初期UI実装段階
 - 最終更新日: 2026-08-01
 - プロダクト要件の正本: [`README.md`](../README.md)
 
@@ -69,6 +69,13 @@ ORIONの機能は次の2つです。
 - 共通ヘッダーからSettingsを開けるようにします。
 - SettingsではGoogleアカウント、Driveフォルダ、サウンド、触覚、演出軽減を設定します。
 - 最初は縦持ちスマートフォン向けの1カラムUIを基準にします。
+
+### 現在の実装状態
+
+- 共通ヘッダー、下部ナビゲーション、Navigation ComposeによるSettingsを含む画面遷移を実装済みです。
+- 通常起動時はIncoming Intelligenceを選択し、画面を再生成しても選択中のタブを維持します。
+- Incoming Intelligence、Knowledge Archive、Settingsの機能本体は未実装で、各画面には「未実装」と表示します。
+- 各主要画面と共通UIは独立してPreviewでき、画面は外部から状態と操作を受け取る構成にします。
 
 ## 5. UIの世界観
 
