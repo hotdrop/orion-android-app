@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "jp.hotdrop.orion"
         minSdk = 36
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -25,6 +25,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             optimization {
                 enable = false
