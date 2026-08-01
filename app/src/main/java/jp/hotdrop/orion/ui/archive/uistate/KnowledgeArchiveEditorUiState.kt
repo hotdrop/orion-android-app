@@ -1,6 +1,5 @@
 package jp.hotdrop.orion.ui.archive.uistate
 
-import jp.hotdrop.orion.data.normalized
 import jp.hotdrop.orion.model.KnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveEditorFeedback
 import jp.hotdrop.orion.model.KnowledgeArchiveValidationError

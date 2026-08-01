@@ -23,7 +23,6 @@ data class GoogleDriveFile(
 
 interface GoogleDriveRemoteDataSource {
     suspend fun getFolder(accessToken: String, folderId: String): GoogleDriveFile
-
     suspend fun listChildren(accessToken: String, folderId: String): List<GoogleDriveFile>
 }
 

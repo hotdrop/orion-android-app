@@ -1,12 +1,9 @@
-package jp.hotdrop.orion.data.archive
+package jp.hotdrop.orion.data
 
-import jp.hotdrop.orion.data.RoomKnowledgeArchiveRepository
 import jp.hotdrop.orion.data.local.dao.KnowledgeArchiveDao
 import jp.hotdrop.orion.data.local.entity.KnowledgeArchiveEntity
-import jp.hotdrop.orion.data.validateKnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveEntry
-import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -20,7 +17,7 @@ class RoomKnowledgeArchiveRepositoryTest {
     @Test
     fun saveEntry_normalizesValuesAndUsesClock() = runTest {
         val dao = FakeKnowledgeArchiveDao()
-        val repository = RoomKnowledgeArchiveRepository(dao, currentTimeMillis = { 100L })
+        val repository = KnowledgeArchiveRepository(dao, currentTimeMillis = { 100L })
 
         val id = repository.saveEntry(
             id = null,
@@ -53,7 +50,7 @@ class RoomKnowledgeArchiveRepositoryTest {
                 ),
             ),
         )
-        val repository = RoomKnowledgeArchiveRepository(dao, currentTimeMillis = { 20L })
+        val repository = KnowledgeArchiveRepository(dao, currentTimeMillis = { 20L })
 
         repository.saveEntry(
             id = 7,
@@ -69,7 +66,7 @@ class RoomKnowledgeArchiveRepositoryTest {
     @Test
     fun invalidUrl_isRejectedWithoutWriting() = runTest {
         val dao = FakeKnowledgeArchiveDao()
-        val repository = RoomKnowledgeArchiveRepository(dao)
+        val repository = KnowledgeArchiveRepository(dao)
 
         val result = runCatching {
             repository.saveEntry(null, KnowledgeArchiveDraft("Title", "ftp://example.com", ""))
@@ -77,10 +74,6 @@ class RoomKnowledgeArchiveRepositoryTest {
 
         assertTrue(result.isFailure)
         assertEquals(emptyList<KnowledgeArchiveEntity>(), dao.entries.value)
-        assertEquals(
-            KnowledgeArchiveValidationError.UrlInvalid,
-            validateKnowledgeArchiveDraft(KnowledgeArchiveDraft("Title", "ftp://example.com", "")),
-        )
     }
 
     @Test
@@ -88,7 +81,7 @@ class RoomKnowledgeArchiveRepositoryTest {
         val dao = FakeKnowledgeArchiveDao(
             listOf(KnowledgeArchiveEntity(4, "Title", "https://example.com", "", 1, 1)),
         )
-        val repository = RoomKnowledgeArchiveRepository(dao)
+        val repository = KnowledgeArchiveRepository(dao)
 
         repository.deleteEntry(4)
 

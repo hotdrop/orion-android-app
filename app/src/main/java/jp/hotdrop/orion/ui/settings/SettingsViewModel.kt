@@ -1,12 +1,11 @@
 package jp.hotdrop.orion.ui.settings
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.inject.Inject
 import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
 import jp.hotdrop.orion.data.SettingsRepository
@@ -22,7 +21,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val driveRemoteDataSource: GoogleDriveRemoteDataSource,
 ) : ViewModel() {
@@ -170,16 +170,5 @@ class SettingsViewModel(
 
     private fun logFailure(message: String, error: Throwable) {
         Logger.getLogger(SettingsViewModel::class.java.name).log(Level.SEVERE, message, error)
-    }
-
-    companion object {
-        fun factory(
-            settingsRepository: SettingsRepository,
-            driveRemoteDataSource: GoogleDriveRemoteDataSource,
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(settingsRepository, driveRemoteDataSource)
-            }
-        }
     }
 }

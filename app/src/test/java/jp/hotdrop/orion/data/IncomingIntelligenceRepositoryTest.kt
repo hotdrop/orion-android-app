@@ -1,6 +1,5 @@
-package jp.hotdrop.orion.data.incoming
+package jp.hotdrop.orion.data
 
-import jp.hotdrop.orion.data.RoomIncomingIntelligenceRepository
 import jp.hotdrop.orion.data.local.dao.IncomingIntelligenceDao
 import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceEntity
 import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceSyncStateEntity
@@ -29,7 +28,7 @@ class RoomIncomingIntelligenceRepositoryTest {
                 "compose" to listOf(document("doc-compose", "Compose Doc", 20)),
             ),
         )
-        val repository = RoomIncomingIntelligenceRepository(dao, remote)
+        val repository = IncomingIntelligenceRepository(dao, remote)
 
         repository.synchronize("root", "token")
 
@@ -49,7 +48,7 @@ class RoomIncomingIntelligenceRepositoryTest {
             children = mapOf("root" to listOf(folder("child", "Child"))),
             failingFolderId = "child",
         )
-        val repository = RoomIncomingIntelligenceRepository(dao, remote)
+        val repository = IncomingIntelligenceRepository(dao, remote)
 
         try {
             repository.synchronize("root", "token")
@@ -78,7 +77,7 @@ class RoomIncomingIntelligenceRepositoryTest {
                 ),
             ),
         )
-        val repository = RoomIncomingIntelligenceRepository(dao, remote)
+        val repository = IncomingIntelligenceRepository(dao, remote)
 
         repository.synchronize("root", "token")
 

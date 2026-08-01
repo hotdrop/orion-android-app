@@ -97,6 +97,7 @@ ORIONの機能は次の2つです。
 - Knowledge Archiveでは、Roomを使用した一覧、追加、編集、削除と外部アプリでのURL表示を実装済みです。
 - Knowledge Archiveの追加・編集画面では下部ナビゲーションを隠し、共通ヘッダーのRETURN操作とシステムの戻る操作で同じ破棄確認を行います。
 - SettingsではGoogle PickerによるDriveフォルダ選択、Roomへの保存、接続解除を実装済みです。その他の設定項目は未実装です。
+- ApplicationスコープのRoom、Repository、Google Driveデータソースと、各画面のViewModelはDagger Hiltで生成・注入します。
 - 各主要画面と共通UIは独立してPreviewでき、画面は外部から状態と操作を受け取る構成にします。
 
 ## 5. UIの世界観

@@ -1,6 +1,5 @@
-package jp.hotdrop.orion.data.settings
+package jp.hotdrop.orion.data
 
-import jp.hotdrop.orion.data.RoomSettingsRepository
 import jp.hotdrop.orion.data.local.dao.SettingsDao
 import jp.hotdrop.orion.data.local.entity.SettingsEntity
 import jp.hotdrop.orion.model.GoogleDriveTarget
@@ -17,7 +16,7 @@ class RoomSettingsRepositoryTest {
     @Test
     fun setDriveTarget_normalizesDisplayPathAndStoresFolderId() = runTest {
         val dao = FakeSettingsDao()
-        val repository = RoomSettingsRepository(dao)
+        val repository = SettingsRepository(dao)
 
         repository.setDriveTarget(GoogleDriveTarget("folder-1", "  /ORION/Incoming/  "))
 
@@ -28,7 +27,7 @@ class RoomSettingsRepositoryTest {
     @Test
     fun observeDriveTarget_ignoresLegacyPathWithoutFolderId() = runTest {
         val dao = FakeSettingsDao(SettingsEntity(googleDrivePath = "ORION/Incoming"))
-        val repository = RoomSettingsRepository(dao)
+        val repository = SettingsRepository(dao)
 
         assertNull(repository.observeDriveTarget().first())
     }
@@ -38,7 +37,7 @@ class RoomSettingsRepositoryTest {
         val dao = FakeSettingsDao(
             SettingsEntity(googleDrivePath = "Incoming", googleDriveFolderId = "folder-1"),
         )
-        val repository = RoomSettingsRepository(dao)
+        val repository = SettingsRepository(dao)
 
         repository.clearDriveTarget()
 
@@ -47,7 +46,7 @@ class RoomSettingsRepositoryTest {
 
     @Test
     fun setDriveTarget_propagatesDaoFailure() = runTest {
-        val repository = RoomSettingsRepository(FakeSettingsDao(failOnWrite = true))
+        val repository = SettingsRepository(FakeSettingsDao(failOnWrite = true))
 
         try {
             repository.setDriveTarget(GoogleDriveTarget("folder-1", "Incoming"))

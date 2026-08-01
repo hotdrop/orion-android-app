@@ -13,22 +13,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.AuthorizationResult
 import jp.hotdrop.orion.data.remote.GoogleDriveAuthorizationClient
-import jp.hotdrop.orion.data.IncomingIntelligenceRepository
-import jp.hotdrop.orion.data.SettingsRepository
 import androidx.core.net.toUri
 
 @Composable
 fun IncomingIntelligenceRoute(
-    settingsRepository: SettingsRepository,
-    incomingRepository: IncomingIntelligenceRepository,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: IncomingIntelligenceViewModel = viewModel(
-        factory = IncomingIntelligenceViewModel.factory(settingsRepository, incomingRepository),
-    ),
+    viewModel: IncomingIntelligenceViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

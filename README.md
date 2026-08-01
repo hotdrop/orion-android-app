@@ -78,6 +78,7 @@ Google Driveの指定したフォルダを設定画面で選択し、画面上�
 * Navigation Compose
 * Coroutines
 * Flow
+* Dagger Hilt
 * Material 3（必要最低限）
 * Canvas
 * Animation

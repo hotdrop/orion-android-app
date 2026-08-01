@@ -11,25 +11,25 @@ import jp.hotdrop.orion.data.local.entity.toRecord
 import java.util.ArrayDeque
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-interface IncomingIntelligenceRepository {
-    fun observeDocuments(rootFolderId: String): Flow<List<IncomingIntelligenceRecord>>
-    fun observeLastSyncedAt(rootFolderId: String): Flow<Long?>
-    suspend fun synchronize(rootFolderId: String, accessToken: String)
-    suspend fun markOpened(rootFolderId: String, driveFileId: String)
-}
-
-class RoomIncomingIntelligenceRepository(
+@Singleton
+class IncomingIntelligenceRepository @Inject constructor(
     private val dao: IncomingIntelligenceDao,
     private val remoteDataSource: GoogleDriveRemoteDataSource,
-) : IncomingIntelligenceRepository {
-    override fun observeDocuments(rootFolderId: String): Flow<List<IncomingIntelligenceRecord>> =
-        dao.observeDocuments(rootFolderId).map { entities -> entities.map { it.toRecord() } }
+) {
+    fun observeDocuments(rootFolderId: String): Flow<List<IncomingIntelligenceRecord>> {
+        return dao.observeDocuments(rootFolderId).map { entities ->
+            entities.map { it.toRecord() }
+        }
+    }
 
-    override fun observeLastSyncedAt(rootFolderId: String): Flow<Long?> =
-        dao.observeLastSyncedAt(rootFolderId)
+    fun observeLastSyncedAt(rootFolderId: String): Flow<Long?> {
+        return dao.observeLastSyncedAt(rootFolderId)
+    }
 
-    override suspend fun synchronize(rootFolderId: String, accessToken: String) {
+    suspend fun synchronize(rootFolderId: String, accessToken: String) {
         val cachedById = dao.getDocuments(rootFolderId).associateBy { it.driveFileId }
         val remoteDocuments = fetchAllDocuments(rootFolderId, accessToken)
         val entities = remoteDocuments.map { document ->
@@ -40,8 +40,7 @@ class RoomIncomingIntelligenceRepository(
                 title = document.file.name,
                 modifiedAt = document.file.modifiedAt,
                 relativePath = document.relativePath,
-                webUrl = document.file.webViewLink
-                    ?: "https://docs.google.com/document/d/${document.file.id}/edit",
+                webUrl = document.file.webViewLink ?: "https://docs.google.com/document/d/${document.file.id}/edit",
                 isNew = cached == null || cached.isNew || cached.modifiedAt < document.file.modifiedAt,
             )
         }
@@ -49,7 +48,7 @@ class RoomIncomingIntelligenceRepository(
         dao.replaceForRoot(rootFolderId, entities, System.currentTimeMillis())
     }
 
-    override suspend fun markOpened(rootFolderId: String, driveFileId: String) {
+    suspend fun markOpened(rootFolderId: String, driveFileId: String) {
         dao.markOpened(rootFolderId, driveFileId)
     }
 
@@ -80,6 +79,14 @@ class RoomIncomingIntelligenceRepository(
         }
         return documents.sortedByDescending { it.file.modifiedAt }
     }
+
+    private fun joinPath(parent: String, child: String): String {
+        return if (parent.isEmpty()) {
+            child
+        } else {
+            "$parent/$child"
+        }
+    }
 }
 
 private data class FolderToScan(
@@ -91,5 +98,3 @@ private data class RemoteDocument(
     val file: GoogleDriveFile,
     val relativePath: String,
 )
-
-private fun joinPath(parent: String, child: String): String = if (parent.isEmpty()) child else "$parent/$child"

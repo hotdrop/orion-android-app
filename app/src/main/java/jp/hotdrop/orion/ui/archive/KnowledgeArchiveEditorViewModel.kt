@@ -1,17 +1,17 @@
 package jp.hotdrop.orion.ui.archive
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.inject.Inject
 import jp.hotdrop.orion.data.KnowledgeArchiveRepository
-import jp.hotdrop.orion.data.normalized
-import jp.hotdrop.orion.data.validateKnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveEditorFeedback
+import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +20,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.URI
 
-class KnowledgeArchiveEditorViewModel(
+@HiltViewModel
+class KnowledgeArchiveEditorViewModel @Inject constructor(
     private val repository: KnowledgeArchiveRepository,
-    private val entryId: Long?,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val entryId: Long? = savedStateHandle[OrionDestination.ArchiveEntryIdArgument]
     private val _uiState = MutableStateFlow(
         KnowledgeArchiveEditorUiState(
             entryId = entryId,
@@ -134,6 +137,22 @@ class KnowledgeArchiveEditorViewModel(
         }
     }
 
+    private fun validateKnowledgeArchiveDraft(
+        draft: KnowledgeArchiveDraft,
+    ): KnowledgeArchiveValidationError? = when {
+        draft.title.isBlank() -> KnowledgeArchiveValidationError.TitleRequired
+        draft.url.isBlank() -> KnowledgeArchiveValidationError.UrlRequired
+        !draft.url.isHttpUrl() -> KnowledgeArchiveValidationError.UrlInvalid
+        else -> null
+    }
+
+    private fun String.isHttpUrl(): Boolean = runCatching {
+        val uri = URI(trim())
+        (uri.scheme.equals("http", ignoreCase = true) ||
+                uri.scheme.equals("https", ignoreCase = true)) &&
+                !uri.host.isNullOrBlank()
+    }.getOrDefault(false)
+
     private fun loadEntry(id: Long) {
         viewModelScope.launch {
             try {
@@ -179,15 +198,6 @@ class KnowledgeArchiveEditorViewModel(
             message,
             error,
         )
-    }
-
-    companion object {
-        fun factory(
-            repository: KnowledgeArchiveRepository,
-            entryId: Long?,
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer { KnowledgeArchiveEditorViewModel(repository, entryId) }
-        }
     }
 }
 

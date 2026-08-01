@@ -38,8 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import jp.hotdrop.orion.model.KnowledgeArchiveEditorFeedback
 import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
@@ -61,14 +60,9 @@ internal const val DeleteArchiveEntryButtonTag = "delete_archive_entry_button"
 
 @Composable
 fun KnowledgeArchiveEditorRoute(
-    repository: KnowledgeArchiveRepository,
-    entryId: Long?,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: KnowledgeArchiveEditorViewModel = viewModel(
-        key = "knowledge_archive_editor_${entryId ?: "new"}",
-        factory = KnowledgeArchiveEditorViewModel.factory(repository, entryId),
-    ),
+    viewModel: KnowledgeArchiveEditorViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

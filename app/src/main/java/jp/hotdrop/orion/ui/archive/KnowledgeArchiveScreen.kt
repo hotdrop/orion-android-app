@@ -40,8 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import jp.hotdrop.orion.model.KnowledgeArchiveEntry
 import jp.hotdrop.orion.ui.archive.components.KnowledgeArchiveCard
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveUiState
@@ -60,13 +59,10 @@ internal const val ArchiveEntryListTag = "archive_entry_list"
 
 @Composable
 fun KnowledgeArchiveRoute(
-    repository: KnowledgeArchiveRepository,
     onCreateEntry: () -> Unit,
     onEditEntry: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: KnowledgeArchiveViewModel = viewModel(
-        factory = KnowledgeArchiveViewModel.factory(repository),
-    ),
+    viewModel: KnowledgeArchiveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

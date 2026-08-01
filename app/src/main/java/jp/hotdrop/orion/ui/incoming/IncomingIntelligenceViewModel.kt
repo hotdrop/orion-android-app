@@ -1,15 +1,14 @@
 package jp.hotdrop.orion.ui.incoming
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.inject.Inject
 import jp.hotdrop.orion.data.remote.GoogleDriveApiException
 import jp.hotdrop.orion.data.remote.GoogleDriveNetworkException
 import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceRecord
@@ -30,7 +29,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class IncomingIntelligenceViewModel(
+@HiltViewModel
+class IncomingIntelligenceViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val incomingRepository: IncomingIntelligenceRepository,
 ) : ViewModel() {
@@ -153,13 +153,6 @@ class IncomingIntelligenceViewModel(
     }
 
     companion object {
-        fun factory(
-            settingsRepository: SettingsRepository,
-            incomingRepository: IncomingIntelligenceRepository,
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer { IncomingIntelligenceViewModel(settingsRepository, incomingRepository) }
-        }
-
         private val TimestampFormatter = DateTimeFormatter.ofPattern("MM/dd HH:mm")
 
         private fun formatTimestamp(timestamp: Long): String =
