@@ -89,7 +89,7 @@ private fun KnowledgeArchiveEditorConfirmationDialogContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorConfirmationDialogPreview() {
     OrionTheme {
@@ -104,7 +104,7 @@ private fun KnowledgeArchiveEditorConfirmationDialogPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorDestructiveConfirmationDialogPreview() {
     OrionTheme {

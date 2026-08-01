@@ -42,7 +42,7 @@ fun KnowledgeArchiveEntryList(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEntryListPreview() {
     OrionTheme {

@@ -64,7 +64,7 @@ private fun editorFeedbackContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorFeedbackPreview() {
     OrionTheme {
@@ -77,7 +77,7 @@ private fun KnowledgeArchiveEditorFeedbackPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorFeedbackErrorPreview() {
     OrionTheme {

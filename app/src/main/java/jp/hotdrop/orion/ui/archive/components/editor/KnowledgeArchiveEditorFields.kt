@@ -125,7 +125,7 @@ private fun archiveTextFieldColors() = OutlinedTextFieldDefaults.colors(
     disabledContainerColor = OrionPanelElevated.copy(alpha = 0.2f),
 )
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorFieldsPreview() {
     OrionTheme {
@@ -142,7 +142,7 @@ private fun KnowledgeArchiveEditorFieldsPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorFieldsValidationErrorPreview() {
     OrionTheme {

@@ -71,7 +71,7 @@ private fun SettingsStatusTone.toColor(): Color = when (this) {
     SettingsStatusTone.Error -> OrionError
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsStatusPanelReadyPreview() {
     OrionTheme {
@@ -83,7 +83,7 @@ private fun SettingsStatusPanelReadyPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsStatusPanelErrorPreview() {
     OrionTheme {

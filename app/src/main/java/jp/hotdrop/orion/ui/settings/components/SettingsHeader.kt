@@ -48,7 +48,7 @@ fun SettingsHeader(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsHeaderPreview() {
     OrionTheme { SettingsHeader() }

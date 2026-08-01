@@ -94,7 +94,7 @@ fun KnowledgeArchiveEditorDeleteButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorSaveButtonPreview() {
     OrionTheme {
@@ -106,7 +106,7 @@ private fun KnowledgeArchiveEditorSaveButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEditorDeleteButtonPreview() {
     OrionTheme {

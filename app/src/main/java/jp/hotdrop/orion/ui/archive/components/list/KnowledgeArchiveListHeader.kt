@@ -89,7 +89,7 @@ fun KnowledgeArchiveListHeader(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveListHeaderPreview() {
     OrionTheme {

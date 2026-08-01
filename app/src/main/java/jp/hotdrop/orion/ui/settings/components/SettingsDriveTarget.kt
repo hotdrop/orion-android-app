@@ -62,7 +62,7 @@ fun SettingsDriveTarget(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsDriveTargetConfiguredPreview() {
     OrionTheme {
@@ -73,7 +73,7 @@ private fun SettingsDriveTargetConfiguredPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsDriveTargetUnsetPreview() {
     OrionTheme {
@@ -84,7 +84,7 @@ private fun SettingsDriveTargetUnsetPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsDriveTargetLoadingPreview() {
     OrionTheme {

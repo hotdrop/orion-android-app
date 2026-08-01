@@ -115,25 +115,25 @@ fun KnowledgeArchiveListErrorPanel(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveListLoadingPreview() {
     OrionTheme { KnowledgeArchiveListLoading() }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveListEmptyPreview() {
     OrionTheme { KnowledgeArchiveListEmpty() }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveListLoadErrorPreview() {
     OrionTheme { KnowledgeArchiveListLoadError() }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveListErrorPanelPreview() {
     OrionTheme {

@@ -100,7 +100,7 @@ fun SettingsClearDriveTargetButton(
 
 private val SettingsActionShape = CutCornerShape(topStart = 10.dp, bottomEnd = 10.dp)
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsSelectDriveFolderButtonPreview() {
     OrionTheme {
@@ -112,7 +112,7 @@ private fun SettingsSelectDriveFolderButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsSelectDriveFolderButtonSelectingPreview() {
     OrionTheme {
@@ -124,7 +124,7 @@ private fun SettingsSelectDriveFolderButtonSelectingPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsClearDriveTargetButtonPreview() {
     OrionTheme {

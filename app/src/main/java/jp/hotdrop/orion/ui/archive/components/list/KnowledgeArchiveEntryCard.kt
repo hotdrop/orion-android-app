@@ -122,7 +122,7 @@ private fun ArchiveCardAction(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun ArchiveCardActionPreview() {
     OrionTheme {
@@ -134,7 +134,7 @@ private fun ArchiveCardActionPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KnowledgeArchiveEntryCardPreview() {
     OrionTheme {

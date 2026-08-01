@@ -38,8 +38,15 @@ fun SettingsDriveTargetPanel(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, OrionCyanMuted, SettingsPanelShape)
-            .background(OrionPanel.copy(alpha = 0.82f), SettingsPanelShape)
+            .border(
+                width = 1.dp,
+                color = OrionCyanMuted,
+                shape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp)
+            )
+            .background(
+                color = OrionPanel.copy(alpha = 0.82f),
+                shape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp)
+            )
             .padding(18.dp),
     ) {
         Text(
@@ -76,9 +83,7 @@ fun SettingsDriveTargetPanel(
     }
 }
 
-private val SettingsPanelShape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp)
-
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsDriveTargetPanelConfiguredPreview() {
     OrionTheme {
@@ -94,7 +99,7 @@ private fun SettingsDriveTargetPanelConfiguredPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SettingsDriveTargetPanelSelectingPreview() {
     OrionTheme {
