@@ -20,7 +20,7 @@
 
 ## スキル利用
 
-- アーキテクチャ、状態管理、データ境界、Room、Google Drive連携、DI、モジュール構成を扱う場合は `.skills/android-app-architecture/SKILL.md` を読む。
+- 新規画面構成、Activity・Composableの責務分割、Navigation、状態管理、パッケージ構成、データ境界、Room、Google Drive連携、DI、モジュール構成を扱う場合は `.skills/android-app-architecture/SKILL.md` を読む。
 - Compose UI、テーマ、Canvas、アニメーション、サウンド、触覚、アクセシビリティ、描画性能を扱う場合は `.skills/orion-ui-experience/SKILL.md` を読む。
 - Androidのコードやビルド設定を変更する場合は `.skills/android-quality-gates/SKILL.md` を読み、リスクに合う検証を行う。
 - 最新Android仕様、SDK、エミュレータ、実行、画面・レイアウト調査、Android Studio連携が必要な場合だけ `.skills/android-cli-usage/SKILL.md` を読む。コマンド仕様が必要なら汎用 `android-cli` スキルも読む。

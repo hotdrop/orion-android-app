@@ -1,6 +1,6 @@
 ---
 name: android-app-architecture
-description: Design or modify ORION's Android architecture, state management, feature boundaries, persistence, Room schema, Google Drive integration, dependency injection, repositories, use cases, or module structure. Use before introducing an architectural library or changing data ownership and synchronization behavior.
+description: Design or modify ORION's Android architecture, Activity and Composable responsibilities, Navigation, state management, package and feature boundaries, persistence, Room schema, Google Drive integration, dependency injection, repositories, use cases, or module structure. Use before adding a screen structure, introducing an architectural library, or changing ownership boundaries.
 ---
 
 # ORION Android Architecture
@@ -11,6 +11,12 @@ description: Design or modify ORION's Android architecture, state management, fe
 - READMEのTech Stackは方向性として扱い、依存関係に存在しないRoom、Navigation、DIなどを導入済みとみなさない。
 - 仕様がREADMEにない場合は、実装で仕様を創作せず、必要な判断をユーザーへ確認する。
 
+## 基本原則
+
+- SOLID原則をはじめソフトウェア開発の基本原則を遵守し、新人や中堅ではなくプロフェッショナルなコードを書く。
+- 責務分離やレイヤー分けを必ず行い、可読性を担保する。
+- 保守性・性能・品質を高く保つよう実装する。
+
 ## 小さく構成する
 
 - 単一の `app` モジュールから開始し、機能単位のパッケージと明確な責務で整理する。
@@ -19,6 +25,14 @@ description: Design or modify ORION's Android architecture, state management, fe
 - ライフサイクルを越えて状態を保持する必要がある画面ではViewModelを使い、永続化や外部SDKの詳細をComposableへ置かない。
 - UseCaseは、複数画面で再利用する処理、複数データ源を調停する処理、独立して検証すべき複雑なルールにだけ導入する。
 - interfaceと実装クラスを機械的に対で作らない。外部サービス境界、端末機能境界、テスト差し替えなど明確な理由がある場所だけ抽象化する。
+
+## UI実装の所有境界を先に決める
+
+- 新規画面やナビゲーションを実装する前に、Activity、アプリシェル、Navigation、状態所有者、機能画面、再利用UIの責務と配置を決める。プレースホルダーや小規模な初期実装でも省略しない。
+- ActivityはAndroidライフサイクル、edge-to-edge、Composition Rootに限定し、画面UI、ナビゲーション状態、機能固有のComposable、再利用コンポーネントを集約しない。
+- 機能画面は機能単位のパッケージへ置き、複数画面で共有するUIは共通コンポーネントへ分離する。ファイルやComposableへ変更理由の異なる責務を寄せ集めない。
+- ViewModelなどの状態所有者とNavigationを画面描画から分離し、画面Composableは状態とイベントを受け取るstatelessな構造を基本とする。ただし、保持すべき状態がない画面へViewModelを機械的に追加しない。
+- 「まず一箇所へ実装して後で分割する」を既定の進め方にしない。最小構成でも将来の変更理由に沿った所有境界を最初から守る。
 
 ## ローカルファーストを守る
 
@@ -39,6 +53,8 @@ description: Design or modify ORION's Android architecture, state management, fe
 ## 完了条件
 
 - UI、状態管理、永続化、外部連携の所有境界を説明できる。
+- Activityや単一Composableへ異なる責務が集中していないことを差分で確認している。
+- 新規画面では、`.skills/orion-ui-experience/SKILL.md` のPreview要件と `.skills/android-quality-gates/SKILL.md` の主要導線テスト要件を満たしている。
 - ローカルデータの正本と同期時のユーザー編集値の扱いが明確である。
 - 不要なレイヤー、interface、モジュール、依存関係を増やしていない。
 - エラーのユーザー表示、再試行、内部診断を混同していない。
