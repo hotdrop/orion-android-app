@@ -1,5 +1,13 @@
 package jp.hotdrop.orion.data.incoming
 
+import jp.hotdrop.orion.data.RoomIncomingIntelligenceRepository
+import jp.hotdrop.orion.data.local.dao.IncomingIntelligenceDao
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceEntity
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceSyncStateEntity
+import jp.hotdrop.orion.data.remote.GoogleDocumentMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveFile
+import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

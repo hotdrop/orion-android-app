@@ -7,10 +7,13 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
 import java.util.logging.Level
 import java.util.logging.Logger
-import jp.hotdrop.orion.data.incoming.GoogleDriveFolderMimeType
-import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.SettingsRepository
+import jp.hotdrop.orion.model.GoogleDriveTarget
+import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
+import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
+import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

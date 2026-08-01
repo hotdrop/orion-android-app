@@ -1,7 +1,7 @@
-package jp.hotdrop.orion.ui.settings
+package jp.hotdrop.orion.ui.settings.uistate
 
 import androidx.compose.runtime.Immutable
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
+import jp.hotdrop.orion.model.GoogleDriveTarget
 
 @Immutable
 data class SettingsUiState(
@@ -14,9 +14,6 @@ data class SettingsUiState(
 
     val isSelectingFolder: Boolean
         get() = operation == SettingsOperation.SelectingFolder
-
-    val isClearing: Boolean
-        get() = operation == SettingsOperation.Clearing
 
     val canSelectFolder: Boolean
         get() = operation == SettingsOperation.Idle

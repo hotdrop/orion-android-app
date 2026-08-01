@@ -1,7 +1,10 @@
 package jp.hotdrop.orion.ui.settings
 
 import jp.hotdrop.orion.R
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
+import jp.hotdrop.orion.data.GoogleDriveTarget
+import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
+import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
+import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

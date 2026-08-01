@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.AuthorizationResult
-import jp.hotdrop.orion.data.incoming.GoogleDriveAuthorizationClient
+import jp.hotdrop.orion.data.remote.GoogleDriveAuthorizationClient
 
 internal sealed interface GoogleDriveFolderPickerResult {
     data class Selected(val accessToken: String, val folderId: String) : GoogleDriveFolderPickerResult
@@ -79,7 +79,7 @@ internal fun rememberGoogleDriveFolderPicker(
 private fun AuthorizationResult.toFolderPickerResult(): GoogleDriveFolderPickerResult {
     val token = accessToken?.takeIf(String::isNotBlank)
     val folderId = tokenResponseParams
-        ?.getString(GoogleDriveAuthorizationClient.PickedFileIdsParameter)
+        ?.getString(GoogleDriveAuthorizationClient.PICKED_FILE_IDS_PARAMETER)
         ?.substringBefore(',')
         ?.takeIf(String::isNotBlank)
 

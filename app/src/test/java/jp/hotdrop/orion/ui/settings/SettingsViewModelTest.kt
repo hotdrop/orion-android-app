@@ -1,10 +1,12 @@
 package jp.hotdrop.orion.ui.settings
 
-import jp.hotdrop.orion.data.incoming.GoogleDriveFile
-import jp.hotdrop.orion.data.incoming.GoogleDriveFolderMimeType
-import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveFile
+import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.GoogleDriveTarget
+import jp.hotdrop.orion.data.SettingsRepository
+import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
+import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

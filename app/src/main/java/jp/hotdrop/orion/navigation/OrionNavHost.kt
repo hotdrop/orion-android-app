@@ -8,10 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
-import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.IncomingIntelligenceRepository
+import jp.hotdrop.orion.data.SettingsRepository
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveEditorRoute
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveRoute
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceRoute

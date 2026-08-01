@@ -3,6 +3,9 @@ package jp.hotdrop.orion.ui.settings
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import jp.hotdrop.orion.R
+import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
+import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
+import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
 
 @Immutable
 internal data class SettingsStatusPresentation(

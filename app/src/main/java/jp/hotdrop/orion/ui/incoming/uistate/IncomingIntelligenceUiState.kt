@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.incoming
+package jp.hotdrop.orion.ui.incoming.uistate
 
 import jp.hotdrop.orion.model.IncomingIntelligenceDocument
 

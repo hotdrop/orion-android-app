@@ -15,9 +15,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.auth.api.identity.AuthorizationResult
-import jp.hotdrop.orion.data.incoming.GoogleDriveAuthorizationClient
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveAuthorizationClient
+import jp.hotdrop.orion.data.IncomingIntelligenceRepository
+import jp.hotdrop.orion.data.SettingsRepository
 import androidx.core.net.toUri
 
 @Composable

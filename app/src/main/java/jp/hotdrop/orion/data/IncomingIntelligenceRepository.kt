@@ -1,16 +1,21 @@
-package jp.hotdrop.orion.data.incoming
+package jp.hotdrop.orion.data
 
+import jp.hotdrop.orion.data.remote.GoogleDocumentMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveFile
+import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.local.dao.IncomingIntelligenceDao
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceEntity
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceRecord
+import jp.hotdrop.orion.data.local.entity.toRecord
 import java.util.ArrayDeque
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface IncomingIntelligenceRepository {
     fun observeDocuments(rootFolderId: String): Flow<List<IncomingIntelligenceRecord>>
-
     fun observeLastSyncedAt(rootFolderId: String): Flow<Long?>
-
     suspend fun synchronize(rootFolderId: String, accessToken: String)
-
     suspend fun markOpened(rootFolderId: String, driveFileId: String)
 }
 
@@ -87,5 +92,4 @@ private data class RemoteDocument(
     val relativePath: String,
 )
 
-private fun joinPath(parent: String, child: String): String =
-    if (parent.isEmpty()) child else "$parent/$child"
+private fun joinPath(parent: String, child: String): String = if (parent.isEmpty()) child else "$parent/$child"

@@ -41,8 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveEntry
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
+import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import jp.hotdrop.orion.model.KnowledgeArchiveEntry
+import jp.hotdrop.orion.ui.archive.components.KnowledgeArchiveCard
+import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveUiState
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
@@ -192,93 +194,6 @@ private fun ArchiveModuleHeader(
 }
 
 @Composable
-private fun KnowledgeArchiveCard(
-    entry: KnowledgeArchiveEntry,
-    onEdit: () -> Unit,
-    onOpenUrl: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, OrionCyanMuted.copy(alpha = 0.75f), CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp))
-            .background(OrionPanelElevated.copy(alpha = 0.55f), CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp))
-            .clickable(role = Role.Button, onClick = onEdit)
-            .semantics { contentDescription = "${entry.title}の記録を編集" }
-            .padding(16.dp),
-    ) {
-        Text(
-            text = "ARCHIVE RECORD // ${entry.id.toString().padStart(4, '0')}",
-            color = OrionCyan,
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.1.sp,
-        )
-        Spacer(modifier = Modifier.height(7.dp))
-        Text(
-            text = entry.title,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-        if (entry.memo.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = entry.memo,
-                color = OrionTextMuted,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            ArchiveCardAction(
-                label = "OPEN LINK",
-                accessibilityLabel = "${entry.title}のURLを開く",
-                onClick = onOpenUrl,
-                modifier = Modifier.weight(1f),
-            )
-            ArchiveCardAction(
-                label = "EDIT",
-                accessibilityLabel = "${entry.title}を編集",
-                onClick = onEdit,
-                modifier = Modifier.weight(1f),
-            )
-        }
-    }
-}
-
-@Composable
-private fun ArchiveCardAction(
-    label: String,
-    accessibilityLabel: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .heightIn(min = 48.dp)
-            .border(1.dp, OrionCyanMuted, CutCornerShape(topStart = 6.dp, bottomEnd = 6.dp))
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = accessibilityLabel },
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "[ $label ]",
-            color = OrionCyan,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-        )
-    }
-}
-
-@Composable
 private fun ArchiveLoadingState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -363,7 +278,7 @@ private fun openExternalUrl(context: Context, url: String): Boolean = try {
     false
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
+@Preview(showBackground = true)
 @Composable
 private fun KnowledgeArchiveEmptyPreview() {
     OrionTheme {
@@ -377,7 +292,7 @@ private fun KnowledgeArchiveEmptyPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
+@Preview(showBackground = true)
 @Composable
 private fun KnowledgeArchivePopulatedPreview() {
     OrionTheme {

@@ -1,6 +1,5 @@
-package jp.hotdrop.orion.data.incoming
+package jp.hotdrop.orion.data.remote
 
-import android.net.Uri
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -9,6 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import androidx.core.net.toUri
 
 internal const val GoogleDriveFolderMimeType = "application/vnd.google-apps.folder"
 internal const val GoogleDocumentMimeType = "application/vnd.google-apps.document"
@@ -32,9 +32,9 @@ class HttpGoogleDriveRemoteDataSource(
 ) : GoogleDriveRemoteDataSource {
     override suspend fun getFolder(accessToken: String, folderId: String): GoogleDriveFile =
         withContext(ioDispatcher) {
-            val url = Uri.parse("https://www.googleapis.com/drive/v3/files/$folderId")
+            val url = "https://www.googleapis.com/drive/v3/files/$folderId".toUri()
                 .buildUpon()
-                .appendQueryParameter("fields", DriveFileFields)
+                .appendQueryParameter("fields", DRIVE_FILE_FIELDS)
                 .build()
                 .toString()
             parseFile(executeGet(url, accessToken))
@@ -47,15 +47,14 @@ class HttpGoogleDriveRemoteDataSource(
         val files = mutableListOf<GoogleDriveFile>()
         var pageToken: String? = null
         do {
-            val query = "'$folderId' in parents and trashed = false and " +
-                "(mimeType = '$GoogleDriveFolderMimeType' or mimeType = '$GoogleDocumentMimeType')"
-            val uriBuilder = Uri.parse("https://www.googleapis.com/drive/v3/files")
+            val query = "'$folderId' in parents and trashed = false and " + "(mimeType = '$GoogleDriveFolderMimeType' or mimeType = '$GoogleDocumentMimeType')"
+            val uriBuilder = "https://www.googleapis.com/drive/v3/files".toUri()
                 .buildUpon()
                 .appendQueryParameter("q", query)
                 .appendQueryParameter("spaces", "drive")
                 .appendQueryParameter("orderBy", "modifiedTime desc")
                 .appendQueryParameter("pageSize", "1000")
-                .appendQueryParameter("fields", "nextPageToken,files($DriveFileFields)")
+                .appendQueryParameter("fields", "nextPageToken,files($DRIVE_FILE_FIELDS)")
             pageToken?.let { uriBuilder.appendQueryParameter("pageToken", it) }
 
             val response = executeGet(uriBuilder.build().toString(), accessToken)
@@ -72,8 +71,8 @@ class HttpGoogleDriveRemoteDataSource(
         val connection = URL(url).openConnection() as HttpURLConnection
         return try {
             connection.requestMethod = "GET"
-            connection.connectTimeout = ConnectTimeoutMillis
-            connection.readTimeout = ReadTimeoutMillis
+            connection.connectTimeout = 15_000
+            connection.readTimeout = 30_000
             connection.setRequestProperty("Authorization", "Bearer $accessToken")
             connection.setRequestProperty("Accept", "application/json")
 
@@ -109,9 +108,7 @@ class HttpGoogleDriveRemoteDataSource(
     )
 
     private companion object {
-        const val DriveFileFields = "id,name,mimeType,modifiedTime,webViewLink"
-        const val ConnectTimeoutMillis = 15_000
-        const val ReadTimeoutMillis = 30_000
+        const val DRIVE_FILE_FIELDS = "id,name,mimeType,modifiedTime,webViewLink"
     }
 }
 

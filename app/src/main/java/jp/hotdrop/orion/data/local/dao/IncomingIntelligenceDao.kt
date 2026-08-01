@@ -1,10 +1,12 @@
-package jp.hotdrop.orion.data.incoming
+package jp.hotdrop.orion.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceEntity
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceSyncStateEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

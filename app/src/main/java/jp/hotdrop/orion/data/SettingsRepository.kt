@@ -1,20 +1,16 @@
-package jp.hotdrop.orion.data.settings
+package jp.hotdrop.orion.data
 
+import jp.hotdrop.orion.data.local.dao.SettingsDao
+import jp.hotdrop.orion.data.local.entity.SettingsEntity
+import jp.hotdrop.orion.model.GoogleDriveTarget
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface SettingsRepository {
     fun observeDriveTarget(): Flow<GoogleDriveTarget?>
-
     suspend fun setDriveTarget(target: GoogleDriveTarget)
-
     suspend fun clearDriveTarget()
 }
-
-data class GoogleDriveTarget(
-    val folderId: String,
-    val displayPath: String,
-)
 
 class RoomSettingsRepository(
     private val settingsDao: SettingsDao,
@@ -47,5 +43,4 @@ class RoomSettingsRepository(
     override suspend fun clearDriveTarget() = settingsDao.delete()
 }
 
-internal fun normalizeGoogleDrivePath(rawPath: String): String =
-    rawPath.trim { character -> character.isWhitespace() || character == '/' }
+internal fun normalizeGoogleDrivePath(rawPath: String): String = rawPath.trim { character -> character.isWhitespace() || character == '/' }

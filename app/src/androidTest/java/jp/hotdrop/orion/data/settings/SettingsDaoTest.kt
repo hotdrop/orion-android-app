@@ -3,6 +3,8 @@ package jp.hotdrop.orion.data.settings
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import jp.hotdrop.orion.data.local.OrionDatabase
+import jp.hotdrop.orion.data.local.dao.SettingsDao
+import jp.hotdrop.orion.data.local.entity.SettingsEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -33,10 +35,20 @@ class SettingsDaoTest {
     fun settings_canBeObservedUpdatedAndDeleted() = runBlocking {
         assertNull(dao.observeSettings().first())
 
-        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Incoming", googleDriveFolderId = "folder-1"))
+        dao.upsert(
+            SettingsEntity(
+                googleDrivePath = "ORION/Incoming",
+                googleDriveFolderId = "folder-1"
+            )
+        )
         assertEquals("folder-1", dao.observeSettings().first()?.googleDriveFolderId)
 
-        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Reports", googleDriveFolderId = "folder-2"))
+        dao.upsert(
+            SettingsEntity(
+                googleDrivePath = "ORION/Reports",
+                googleDriveFolderId = "folder-2"
+            )
+        )
         assertEquals("ORION/Reports", dao.observeSettings().first()?.googleDrivePath)
 
         dao.delete()

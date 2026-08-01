@@ -1,6 +1,6 @@
 package jp.hotdrop.orion.ui.archive
 
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.data.KnowledgeArchiveValidationError
 import jp.hotdrop.orion.ui.settings.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async

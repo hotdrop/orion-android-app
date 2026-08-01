@@ -1,10 +1,11 @@
-package jp.hotdrop.orion.data.archive
+package jp.hotdrop.orion.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import jp.hotdrop.orion.data.local.entity.KnowledgeArchiveEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

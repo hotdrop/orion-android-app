@@ -1,9 +1,9 @@
 package jp.hotdrop.orion.ui.incoming
 
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRecord
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceRecord
+import jp.hotdrop.orion.data.IncomingIntelligenceRepository
+import jp.hotdrop.orion.data.GoogleDriveTarget
+import jp.hotdrop.orion.data.SettingsRepository
 import jp.hotdrop.orion.ui.settings.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

@@ -15,14 +15,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveDraft
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveEntry
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
-import jp.hotdrop.orion.data.incoming.GoogleDriveFile
-import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRecord
-import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveFile
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceRecord
+import jp.hotdrop.orion.data.IncomingIntelligenceRepository
+import jp.hotdrop.orion.data.SettingsRepository
+import jp.hotdrop.orion.model.GoogleDriveTarget
+import jp.hotdrop.orion.model.KnowledgeArchiveDraft
+import jp.hotdrop.orion.model.KnowledgeArchiveEntry
 import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.navigation.OrionNavHost
 import jp.hotdrop.orion.navigation.OrionTopLevelDestination
@@ -149,9 +150,9 @@ private fun OrionRootPreview() {
 }
 
 private val PreviewSettingsRepository = object : SettingsRepository {
-    override fun observeDriveTarget() = kotlinx.coroutines.flow.flowOf<jp.hotdrop.orion.data.settings.GoogleDriveTarget?>(null)
+    override fun observeDriveTarget() = kotlinx.coroutines.flow.flowOf<GoogleDriveTarget?>(null)
 
-    override suspend fun setDriveTarget(target: jp.hotdrop.orion.data.settings.GoogleDriveTarget) = Unit
+    override suspend fun setDriveTarget(target: GoogleDriveTarget) = Unit
 
     override suspend fun clearDriveTarget() = Unit
 }

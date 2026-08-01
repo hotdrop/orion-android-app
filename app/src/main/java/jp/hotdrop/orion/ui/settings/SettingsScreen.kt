@@ -30,12 +30,13 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.hotdrop.orion.R
-import jp.hotdrop.orion.data.settings.GoogleDriveTarget
+import jp.hotdrop.orion.model.GoogleDriveTarget
+import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
+import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
+import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
@@ -295,41 +296,89 @@ private val ActionShape = CutCornerShape(topStart = 10.dp, bottomEnd = 10.dp)
 
 @Preview(showBackground = true)
 @Composable
-private fun SettingsScreenPreview(
-    @PreviewParameter(SettingsPreviewProvider::class) uiState: SettingsUiState,
-) {
+private fun SettingsScreenPreview() {
     OrionTheme {
         SettingsScreen(
-            uiState = uiState,
+            uiState = SettingsUiState(),
             onSelectFolder = {},
             onClearFolder = {},
         )
     }
 }
 
-private class SettingsPreviewProvider : PreviewParameterProvider<SettingsUiState> {
-    override val values: Sequence<SettingsUiState> = sequenceOf(
-        SettingsUiState(),
-        SettingsUiState(operation = SettingsOperation.Idle),
-        SettingsUiState(operation = SettingsOperation.SelectingFolder),
-        SettingsUiState(
-            driveTarget = PreviewDriveTarget,
-            operation = SettingsOperation.Idle,
-            feedback = SettingsFeedback.FolderSaved,
-        ),
-        SettingsUiState(
-            operation = SettingsOperation.Idle,
-            feedback = SettingsFeedback.Cleared,
-        ),
-        SettingsUiState(
-            driveTarget = PreviewDriveTarget,
-            operation = SettingsOperation.Idle,
-            feedback = SettingsFeedback.ClearFailed,
-        ),
-    )
+@Preview(showBackground = true)
+@Composable
+private fun SettingsScreenIdlePreview() {
+    OrionTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(operation = SettingsOperation.Idle),
+            onSelectFolder = {},
+            onClearFolder = {},
+        )
+    }
 }
 
-private val PreviewDriveTarget = GoogleDriveTarget(
-    folderId = "folder-id",
-    displayPath = "ORION/Incoming",
-)
+@Preview(showBackground = true)
+@Composable
+private fun SettingsScreenSelectingFolderPreview() {
+    OrionTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(operation = SettingsOperation.SelectingFolder),
+            onSelectFolder = {},
+            onClearFolder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsScreenFolderSavedPreview() {
+    OrionTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(
+                driveTarget = GoogleDriveTarget(
+                    folderId = "folder-id",
+                    displayPath = "ORION/Incoming",
+                ),
+                operation = SettingsOperation.Idle,
+                feedback = SettingsFeedback.FolderSaved,
+            ),
+            onSelectFolder = {},
+            onClearFolder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsScreenClearedPreview() {
+    OrionTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(
+                operation = SettingsOperation.Idle,
+                feedback = SettingsFeedback.Cleared,
+            ),
+            onSelectFolder = {},
+            onClearFolder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsScreenClearFailedPreview() {
+    OrionTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(
+                driveTarget = GoogleDriveTarget(
+                    folderId = "folder-id",
+                    displayPath = "ORION/Incoming",
+                ),
+                operation = SettingsOperation.Idle,
+                feedback = SettingsFeedback.ClearFailed,
+            ),
+            onSelectFolder = {},
+            onClearFolder = {},
+        )
+    }
+}

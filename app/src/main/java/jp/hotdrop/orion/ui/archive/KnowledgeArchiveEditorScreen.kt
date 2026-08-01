@@ -39,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import jp.hotdrop.orion.model.KnowledgeArchiveEditorFeedback
+import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
@@ -322,12 +324,9 @@ private fun archiveTextFieldColors() = OutlinedTextFieldDefaults.colors(
 @Composable
 private fun EditorFeedbackPanel(uiState: KnowledgeArchiveEditorUiState) {
     val (message, color) = when (uiState.feedback) {
-        KnowledgeArchiveEditorFeedback.LoadFailed ->
-            "LOCAL RECORD // READ ERROR\n記録を読み込めませんでした。" to OrionError
-        KnowledgeArchiveEditorFeedback.SaveFailed ->
-            "LOCAL WRITE // ERROR\n保存できませんでした。入力内容を維持したまま再試行できます。" to OrionError
-        KnowledgeArchiveEditorFeedback.DeleteFailed ->
-            "LOCAL DELETE // ERROR\n削除できませんでした。再試行してください。" to OrionError
+        KnowledgeArchiveEditorFeedback.LoadFailed -> "LOCAL RECORD // READ ERROR\n記録を読み込めませんでした。" to OrionError
+        KnowledgeArchiveEditorFeedback.SaveFailed -> "LOCAL WRITE // ERROR\n保存できませんでした。入力内容を維持したまま再試行できます。" to OrionError
+        KnowledgeArchiveEditorFeedback.DeleteFailed -> "LOCAL DELETE // ERROR\n削除できませんでした。再試行してください。" to OrionError
         KnowledgeArchiveEditorFeedback.None -> when {
             uiState.isSaving -> "LOCAL WRITE // PROCESSING" to OrionCyan
             uiState.isDeleting -> "LOCAL DELETE // PROCESSING" to OrionAmber

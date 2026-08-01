@@ -1,37 +1,18 @@
-package jp.hotdrop.orion.data.archive
+package jp.hotdrop.orion.data
 
+import jp.hotdrop.orion.data.local.dao.KnowledgeArchiveDao
+import jp.hotdrop.orion.data.local.entity.KnowledgeArchiveEntity
+import jp.hotdrop.orion.model.KnowledgeArchiveDraft
+import jp.hotdrop.orion.model.KnowledgeArchiveEntry
+import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
 import java.net.URI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-data class KnowledgeArchiveEntry(
-    val id: Long,
-    val title: String,
-    val url: String,
-    val memo: String,
-    val createdAt: Long,
-    val updatedAt: Long,
-)
-
-data class KnowledgeArchiveDraft(
-    val title: String,
-    val url: String,
-    val memo: String,
-)
-
-enum class KnowledgeArchiveValidationError {
-    TitleRequired,
-    UrlRequired,
-    UrlInvalid,
-}
-
 interface KnowledgeArchiveRepository {
     fun observeEntries(): Flow<List<KnowledgeArchiveEntry>>
-
     suspend fun getEntry(id: Long): KnowledgeArchiveEntry?
-
     suspend fun saveEntry(id: Long?, draft: KnowledgeArchiveDraft): Long
-
     suspend fun deleteEntry(id: Long)
 }
 

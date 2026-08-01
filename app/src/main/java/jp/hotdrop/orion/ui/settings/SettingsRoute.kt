@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.settings.SettingsRepository
+import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.SettingsRepository
 
 @Composable
 fun SettingsRoute(

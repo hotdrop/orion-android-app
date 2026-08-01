@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.data.incoming
+package jp.hotdrop.orion.data.remote
 
 import android.content.Context
 import android.content.Intent
@@ -41,7 +41,7 @@ class GoogleDriveAuthorizationClient(context: Context) {
         client.getAuthorizationResultFromIntent(intent)
 
     companion object {
-        const val PickedFileIdsParameter = "picked_file_ids"
+        const val PICKED_FILE_IDS_PARAMETER = "picked_file_ids"
         private val DriveFileScope = Scope("https://www.googleapis.com/auth/drive.file")
     }
 }

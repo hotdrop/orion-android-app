@@ -3,6 +3,8 @@ package jp.hotdrop.orion.data.archive
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import jp.hotdrop.orion.data.local.OrionDatabase
+import jp.hotdrop.orion.data.local.dao.KnowledgeArchiveDao
+import jp.hotdrop.orion.data.local.entity.KnowledgeArchiveEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

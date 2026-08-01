@@ -6,8 +6,9 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveDraft
-import jp.hotdrop.orion.data.archive.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.data.KnowledgeArchiveDraft
+import jp.hotdrop.orion.data.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import jp.hotdrop.orion.ui.theme.OrionTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
