@@ -43,7 +43,7 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 @Composable
 fun OrionHeader(
     title: String,
-    isShowingSettings: Boolean,
+    isShowingBackNavigation: Boolean,
     onSettingsClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -63,9 +63,9 @@ fun OrionHeader(
         ) {
             OrionSystemStatus()
             OrionHeaderAction(
-                label = if (isShowingSettings) "RETURN" else "CONFIG",
-                accessibilityLabel = if (isShowingSettings) "前の画面へ戻る" else "Settingsを開く",
-                onClick = if (isShowingSettings) onBackClick else onSettingsClick,
+                label = if (isShowingBackNavigation) "RETURN" else "CONFIG",
+                accessibilityLabel = if (isShowingBackNavigation) "前の画面へ戻る" else "Settingsを開く",
+                onClick = if (isShowingBackNavigation) onBackClick else onSettingsClick,
             )
         }
 
@@ -213,7 +213,7 @@ private fun OrionHeaderPreview() {
     OrionTheme {
         OrionHeader(
             title = OrionTopLevelDestination.Incoming.title,
-            isShowingSettings = false,
+            isShowingBackNavigation = false,
             onSettingsClick = {},
             onBackClick = {},
         )

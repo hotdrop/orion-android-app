@@ -15,6 +15,7 @@ class MainActivity : ComponentActivity() {
             OrionTheme {
                 OrionRoot(
                     settingsRepository = (application as OrionApplication).settingsRepository,
+                    knowledgeArchiveRepository = (application as OrionApplication).knowledgeArchiveRepository,
                 )
             }
         }

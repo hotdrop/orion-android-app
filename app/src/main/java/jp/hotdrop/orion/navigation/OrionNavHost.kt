@@ -4,10 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
 import jp.hotdrop.orion.data.settings.SettingsRepository
-import jp.hotdrop.orion.ui.archive.KnowledgeArchiveScreen
+import jp.hotdrop.orion.ui.archive.KnowledgeArchiveEditorRoute
+import jp.hotdrop.orion.ui.archive.KnowledgeArchiveRoute
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceScreen
 import jp.hotdrop.orion.ui.settings.SettingsRoute
 
@@ -16,6 +20,7 @@ fun OrionNavHost(
     navController: NavHostController,
     startDestination: OrionTopLevelDestination,
     settingsRepository: SettingsRepository,
+    knowledgeArchiveRepository: KnowledgeArchiveRepository,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -27,7 +32,39 @@ fun OrionNavHost(
             IncomingIntelligenceScreen(modifier = Modifier)
         }
         composable(OrionTopLevelDestination.Archive.route) {
-            KnowledgeArchiveScreen(modifier = Modifier)
+            KnowledgeArchiveRoute(
+                repository = knowledgeArchiveRepository,
+                onCreateEntry = { navController.navigate(OrionDestination.ArchiveNewRoute) },
+                onEditEntry = { entryId ->
+                    navController.navigate(OrionDestination.archiveEditRoute(entryId))
+                },
+                modifier = Modifier,
+            )
+        }
+        composable(OrionDestination.ArchiveNewRoute) {
+            KnowledgeArchiveEditorRoute(
+                repository = knowledgeArchiveRepository,
+                entryId = null,
+                onClose = navController::popBackStack,
+                modifier = Modifier,
+            )
+        }
+        composable(
+            route = OrionDestination.ArchiveEditRoute,
+            arguments = listOf(
+                navArgument(OrionDestination.ArchiveEntryIdArgument) {
+                    type = NavType.LongType
+                },
+            ),
+        ) { backStackEntry ->
+            val entryId = backStackEntry.arguments?.getLong(OrionDestination.ArchiveEntryIdArgument)
+                ?: return@composable
+            KnowledgeArchiveEditorRoute(
+                repository = knowledgeArchiveRepository,
+                entryId = entryId,
+                onClose = navController::popBackStack,
+                modifier = Modifier,
+            )
         }
         composable(OrionDestination.SettingsRoute) {
             SettingsRoute(

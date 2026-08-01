@@ -1,6 +1,7 @@
 package jp.hotdrop.orion.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import jp.hotdrop.orion.data.archive.KnowledgeArchiveDraft
+import jp.hotdrop.orion.data.archive.KnowledgeArchiveEntry
+import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
 import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.navigation.OrionNavHost
@@ -23,10 +27,13 @@ import jp.hotdrop.orion.ui.components.OrionBottomNavigation
 import jp.hotdrop.orion.ui.components.OrionHeader
 import jp.hotdrop.orion.ui.theme.OrionDeepNavy
 import jp.hotdrop.orion.ui.theme.OrionTheme
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun OrionRoot(
     settingsRepository: SettingsRepository,
+    knowledgeArchiveRepository: KnowledgeArchiveRepository,
     modifier: Modifier = Modifier,
     viewModel: OrionViewModel = viewModel(),
 ) {
@@ -36,6 +43,7 @@ fun OrionRoot(
         selectedDestination = selectedDestination,
         onDestinationSelected = viewModel::selectDestination,
         settingsRepository = settingsRepository,
+        knowledgeArchiveRepository = knowledgeArchiveRepository,
         modifier = modifier,
     )
 }
@@ -45,19 +53,25 @@ internal fun OrionAppShell(
     selectedDestination: OrionTopLevelDestination,
     onDestinationSelected: (OrionTopLevelDestination) -> Unit,
     settingsRepository: SettingsRepository,
+    knowledgeArchiveRepository: KnowledgeArchiveRepository,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val isShowingSettings = currentRoute == OrionDestination.SettingsRoute
+    val isShowingArchiveEditor = currentRoute == OrionDestination.ArchiveNewRoute ||
+        currentRoute == OrionDestination.ArchiveEditRoute
+    val isShowingSecondaryDestination = isShowingSettings || isShowingArchiveEditor
     val currentTopLevelDestination = OrionTopLevelDestination.fromRoute(currentRoute)
         ?: selectedDestination
-    val currentTitle = if (isShowingSettings) {
-        OrionDestination.SettingsTitle
-    } else {
-        currentTopLevelDestination.title
+    val currentTitle = when {
+        isShowingSettings -> OrionDestination.SettingsTitle
+        currentRoute == OrionDestination.ArchiveNewRoute -> OrionDestination.ArchiveNewTitle
+        currentRoute == OrionDestination.ArchiveEditRoute -> OrionDestination.ArchiveEditTitle
+        else -> currentTopLevelDestination.title
     }
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     BackHandler(enabled = isShowingSettings) {
         navController.popBackStack()
@@ -70,17 +84,17 @@ internal fun OrionAppShell(
         topBar = {
             OrionHeader(
                 title = currentTitle,
-                isShowingSettings = isShowingSettings,
+                isShowingBackNavigation = isShowingSecondaryDestination,
                 onSettingsClick = {
                     navController.navigate(OrionDestination.SettingsRoute) {
                         launchSingleTop = true
                     }
                 },
-                onBackClick = navController::popBackStack,
+                onBackClick = { backPressedDispatcher?.onBackPressed() },
             )
         },
         bottomBar = {
-            if (!isShowingSettings) {
+            if (!isShowingSecondaryDestination) {
                 OrionBottomNavigation(
                     selectedDestination = currentTopLevelDestination,
                     onDestinationSelected = { destination ->
@@ -95,6 +109,7 @@ internal fun OrionAppShell(
             navController = navController,
             startDestination = selectedDestination,
             settingsRepository = settingsRepository,
+            knowledgeArchiveRepository = knowledgeArchiveRepository,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -114,6 +129,7 @@ private fun OrionRootPreview() {
             selectedDestination = OrionTopLevelDestination.Incoming,
             onDestinationSelected = {},
             settingsRepository = PreviewSettingsRepository,
+            knowledgeArchiveRepository = PreviewKnowledgeArchiveRepository,
         )
     }
 }
@@ -122,4 +138,14 @@ private val PreviewSettingsRepository = object : SettingsRepository {
     override fun observeGoogleDrivePath() = kotlinx.coroutines.flow.flowOf<String?>(null)
 
     override suspend fun setGoogleDrivePath(rawPath: String) = Unit
+}
+
+private val PreviewKnowledgeArchiveRepository = object : KnowledgeArchiveRepository {
+    override fun observeEntries(): Flow<List<KnowledgeArchiveEntry>> = flowOf(emptyList())
+
+    override suspend fun getEntry(id: Long): KnowledgeArchiveEntry? = null
+
+    override suspend fun saveEntry(id: Long?, draft: KnowledgeArchiveDraft): Long = 1L
+
+    override suspend fun deleteEntry(id: Long) = Unit
 }

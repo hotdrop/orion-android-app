@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import jp.hotdrop.orion.ui.settings.GoogleDrivePathInputTag
+import jp.hotdrop.orion.ui.archive.ArchiveTitleInputTag
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,6 +27,15 @@ class OrionNavigationTest {
             .onNodeWithContentDescription("KNOWLEDGE ARCHIVEを開く")
             .performClick()
             .assertIsSelected()
+        composeRule
+            .onNodeWithContentDescription("現在の画面: KNOWLEDGE ARCHIVE")
+            .assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("新しい記録を追加").performClick()
+        composeRule
+            .onNodeWithContentDescription("現在の画面: NEW KNOWLEDGE RECORD")
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(ArchiveTitleInputTag).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("前の画面へ戻る").performClick()
         composeRule
             .onNodeWithContentDescription("現在の画面: KNOWLEDGE ARCHIVE")
             .assertIsDisplayed()

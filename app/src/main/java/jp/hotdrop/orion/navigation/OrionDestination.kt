@@ -29,4 +29,11 @@ enum class OrionTopLevelDestination(
 object OrionDestination {
     const val SettingsRoute = "settings"
     const val SettingsTitle = "SYSTEM SETTINGS"
+    const val ArchiveNewRoute = "archive/new"
+    const val ArchiveEditRoute = "archive/edit/{entryId}"
+    const val ArchiveEntryIdArgument = "entryId"
+    const val ArchiveNewTitle = "NEW KNOWLEDGE RECORD"
+    const val ArchiveEditTitle = "EDIT KNOWLEDGE RECORD"
+
+    fun archiveEditRoute(entryId: Long): String = "archive/edit/$entryId"
 }
