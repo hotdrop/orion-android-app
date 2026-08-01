@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import jp.hotdrop.orion.model.KnowledgeArchiveEditorFeedback
 import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.ui.archive.components.EditorModuleHeader
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
@@ -204,31 +205,6 @@ fun KnowledgeArchiveEditorScreen(
 }
 
 @Composable
-private fun EditorModuleHeader(isEditing: Boolean) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, OrionCyanMuted, CutCornerShape(topStart = 16.dp, bottomEnd = 16.dp))
-            .background(OrionPanel.copy(alpha = 0.82f), CutCornerShape(topStart = 16.dp, bottomEnd = 16.dp))
-            .padding(16.dp),
-    ) {
-        Text(
-            text = if (isEditing) "ARCHIVE CONTROL // EDIT" else "ARCHIVE CONTROL // NEW",
-            color = OrionCyan,
-            fontSize = 10.sp,
-            letterSpacing = 1.4.sp,
-        )
-        Text(
-            text = if (isEditing) "MODIFY KNOWLEDGE RECORD" else "CAPTURE NEW INTELLIGENCE",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.1.sp,
-        )
-    }
-}
-
-@Composable
 private fun EditorFieldsPanel(
     uiState: KnowledgeArchiveEditorUiState,
     onTitleChanged: (String) -> Unit,
@@ -368,7 +344,7 @@ private fun OrionConfirmationDialog(
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 700)
+@Preview(showBackground = true)
 @Composable
 private fun KnowledgeArchiveNewEditorPreview() {
     OrionTheme {
@@ -391,7 +367,7 @@ private fun KnowledgeArchiveNewEditorPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 700)
+@Preview(showBackground = true)
 @Composable
 private fun KnowledgeArchiveEditorErrorPreview() {
     OrionTheme {

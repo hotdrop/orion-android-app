@@ -10,10 +10,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class KnowledgeArchiveRepository @Inject constructor(
+class KnowledgeArchiveRepository internal constructor(
     private val dao: KnowledgeArchiveDao,
-    private val currentTimeMillis: () -> Long = System::currentTimeMillis,
+    private val currentTimeMillis: () -> Long,
 ) {
+    @Inject
+    constructor(dao: KnowledgeArchiveDao) : this(dao, System::currentTimeMillis)
+
     fun observeEntries(): Flow<List<KnowledgeArchiveEntry>> {
         return dao.observeAll().map { entries ->
             entries.map { entry -> entry.toModel() }
