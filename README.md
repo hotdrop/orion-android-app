@@ -93,3 +93,7 @@ Google Driveの指定したフォルダを設定画面で選択し、画面上�
 * Custom Drawing
 
 ---
+
+# Screen Shot
+![生体認証画面](./images/01_auth_image.png)　
+![トップ画面](./images/02_top_image.png)
