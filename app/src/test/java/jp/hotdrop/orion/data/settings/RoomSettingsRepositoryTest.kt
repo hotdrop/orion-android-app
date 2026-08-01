@@ -2,6 +2,7 @@ package jp.hotdrop.orion.data.settings
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -10,42 +11,42 @@ import org.junit.Test
 
 class RoomSettingsRepositoryTest {
     @Test
-    fun setGoogleDrivePath_normalizesOuterWhitespaceAndSlashes() = runTest {
+    fun setDriveTarget_normalizesDisplayPathAndStoresFolderId() = runTest {
         val dao = FakeSettingsDao()
         val repository = RoomSettingsRepository(dao)
 
-        repository.setGoogleDrivePath("  /ORION/Incoming/  ")
+        repository.setDriveTarget(GoogleDriveTarget("folder-1", "  /ORION/Incoming/  "))
 
-        assertEquals("ORION/Incoming", dao.path.value)
+        assertEquals("folder-1", dao.settings.value?.googleDriveFolderId)
+        assertEquals("ORION/Incoming", dao.settings.value?.googleDrivePath)
     }
 
     @Test
-    fun setGoogleDrivePath_preservesInteriorSeparators() = runTest {
-        val dao = FakeSettingsDao()
+    fun observeDriveTarget_ignoresLegacyPathWithoutFolderId() = runTest {
+        val dao = FakeSettingsDao(SettingsEntity(googleDrivePath = "ORION/Incoming"))
         val repository = RoomSettingsRepository(dao)
 
-        repository.setGoogleDrivePath("/ORION//Incoming/")
-
-        assertEquals("ORION//Incoming", dao.path.value)
+        assertNull(repository.observeDriveTarget().first())
     }
 
     @Test
-    fun setGoogleDrivePath_deletesSettingsWhenNormalizedPathIsEmpty() = runTest {
-        val dao = FakeSettingsDao(initialPath = "ORION/Incoming")
+    fun clearDriveTarget_deletesSettings() = runTest {
+        val dao = FakeSettingsDao(
+            SettingsEntity(googleDrivePath = "Incoming", googleDriveFolderId = "folder-1"),
+        )
         val repository = RoomSettingsRepository(dao)
 
-        repository.setGoogleDrivePath(" / ")
+        repository.clearDriveTarget()
 
-        assertNull(dao.path.value)
+        assertNull(dao.settings.value)
     }
 
     @Test
-    fun setGoogleDrivePath_propagatesDaoFailure() = runTest {
-        val dao = FakeSettingsDao(failOnWrite = true)
-        val repository = RoomSettingsRepository(dao)
+    fun setDriveTarget_propagatesDaoFailure() = runTest {
+        val repository = RoomSettingsRepository(FakeSettingsDao(failOnWrite = true))
 
         try {
-            repository.setGoogleDrivePath("ORION/Incoming")
+            repository.setDriveTarget(GoogleDriveTarget("folder-1", "Incoming"))
             fail("Expected the DAO failure to propagate")
         } catch (error: IllegalStateException) {
             assertEquals("write failed", error.message)
@@ -54,20 +55,20 @@ class RoomSettingsRepositoryTest {
 }
 
 private class FakeSettingsDao(
-    initialPath: String? = null,
+    initialSettings: SettingsEntity? = null,
     private val failOnWrite: Boolean = false,
 ) : SettingsDao {
-    val path = MutableStateFlow(initialPath)
+    val settings = MutableStateFlow(initialSettings)
 
-    override fun observeGoogleDrivePath(id: Int): Flow<String?> = path
+    override fun observeSettings(id: Int): Flow<SettingsEntity?> = settings
 
     override suspend fun upsert(settings: SettingsEntity) {
         check(!failOnWrite) { "write failed" }
-        path.value = settings.googleDrivePath
+        this.settings.value = settings
     }
 
     override suspend fun delete(id: Int) {
         check(!failOnWrite) { "write failed" }
-        path.value = null
+        settings.value = null
     }
 }

@@ -1,5 +1,9 @@
 package jp.hotdrop.orion.ui.settings
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,36 +14,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.auth.api.identity.AuthorizationResult
+import jp.hotdrop.orion.data.incoming.GoogleDriveAuthorizationClient
+import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.settings.GoogleDriveTarget
 import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
@@ -51,23 +54,70 @@ import jp.hotdrop.orion.ui.theme.OrionPanelElevated
 import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
-internal const val GoogleDrivePathInputTag = "google_drive_path_input"
-internal const val SaveSettingsButtonTag = "save_settings_button"
+internal const val SelectDriveFolderButtonTag = "select_drive_folder_button"
+internal const val ClearDriveFolderButtonTag = "clear_drive_folder_button"
 
 @Composable
 fun SettingsRoute(
     settingsRepository: SettingsRepository,
+    driveRemoteDataSource: GoogleDriveRemoteDataSource,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModel.factory(settingsRepository),
+        factory = SettingsViewModel.factory(settingsRepository, driveRemoteDataSource),
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val authorizationClient = remember(context) { GoogleDriveAuthorizationClient(context) }
+
+    fun acceptAuthorizationResult(result: AuthorizationResult) {
+        val token = result.accessToken
+        val pickedFolderId = result.tokenResponseParams
+            ?.getString(GoogleDriveAuthorizationClient.PickedFileIdsParameter)
+            ?.substringBefore(',')
+            ?.takeIf(String::isNotBlank)
+        if (token == null || pickedFolderId == null) {
+            viewModel.reportFolderSelectionFailure()
+        } else {
+            viewModel.saveSelectedFolder(token, pickedFolderId)
+        }
+    }
+
+    val authorizationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult(),
+    ) { activityResult ->
+        if (activityResult.resultCode != Activity.RESULT_OK) {
+            viewModel.reportFolderSelectionFailure()
+            return@rememberLauncherForActivityResult
+        }
+        runCatching { authorizationClient.resultFromIntent(activityResult.data) }
+            .onSuccess(::acceptAuthorizationResult)
+            .onFailure { viewModel.reportFolderSelectionFailure() }
+    }
 
     SettingsScreen(
         uiState = uiState,
-        onGoogleDrivePathChanged = viewModel::onGoogleDrivePathChanged,
-        onSave = viewModel::save,
+        onSelectFolder = {
+            if (viewModel.beginFolderSelection()) {
+                authorizationClient.selectFolder()
+                    .addOnSuccessListener { result ->
+                        if (result.hasResolution()) {
+                            val pendingIntent = result.pendingIntent
+                            if (pendingIntent == null) {
+                                viewModel.reportFolderSelectionFailure()
+                            } else {
+                                authorizationLauncher.launch(
+                                    IntentSenderRequest.Builder(pendingIntent.intentSender).build(),
+                                )
+                            }
+                        } else {
+                            acceptAuthorizationResult(result)
+                        }
+                    }
+                    .addOnFailureListener { viewModel.reportFolderSelectionFailure() }
+            }
+        },
+        onClearFolder = viewModel::clearDriveTarget,
         modifier = modifier,
     )
 }
@@ -75,26 +125,21 @@ fun SettingsRoute(
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
-    onGoogleDrivePathChanged: (String) -> Unit,
-    onSave: () -> Unit,
+    onSelectFolder: () -> Unit,
+    onClearFolder: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(OrionDeepNavy)
-            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         SettingsModuleHeader()
-        DriveTargetPanel(
-            uiState = uiState,
-            onGoogleDrivePathChanged = onGoogleDrivePathChanged,
-            onSave = onSave,
-        )
-        SettingsStatusPanel(uiState = uiState)
+        DriveTargetPanel(uiState, onSelectFolder, onClearFolder)
+        SettingsStatusPanel(uiState)
     }
 }
 
@@ -106,128 +151,101 @@ private fun SettingsModuleHeader() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
+            Text("MODULE // CFG", color = OrionCyan, fontSize = 10.sp, letterSpacing = 1.4.sp)
             Text(
-                text = "MODULE // CFG",
-                color = OrionCyan,
-                fontSize = 10.sp,
-                letterSpacing = 1.4.sp,
-            )
-            Text(
-                text = "LOCAL CONFIGURATION NODE",
+                "LOCAL CONFIGURATION NODE",
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.2.sp,
             )
         }
-        Text(
-            text = "ONLINE",
-            color = OrionCyan,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.4.sp,
-        )
+        Text("ONLINE", color = OrionCyan, fontSize = 10.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 private fun DriveTargetPanel(
     uiState: SettingsUiState,
-    onGoogleDrivePathChanged: (String) -> Unit,
-    onSave: () -> Unit,
+    onSelectFolder: () -> Unit,
+    onClearFolder: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = OrionCyanMuted,
-                shape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp),
-            )
-            .background(
-                color = OrionPanel.copy(alpha = 0.82f),
-                shape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp),
-            )
+            .border(1.dp, OrionCyanMuted, PanelShape)
+            .background(OrionPanel.copy(alpha = 0.82f), PanelShape)
             .padding(18.dp),
     ) {
         Text(
-            text = "GOOGLE DRIVE // TARGET DIRECTORY",
+            "GOOGLE DRIVE // TARGET DIRECTORY",
             color = OrionCyan,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.2.sp,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
-            text = "Incoming Intelligenceを取得する基準フォルダを指定します。",
+            "Incoming Intelligenceを手動取得する基準フォルダを選択します。自動同期は行いません。",
             color = OrionTextMuted,
             style = MaterialTheme.typography.bodyMedium,
         )
-        Spacer(modifier = Modifier.height(18.dp))
-        OutlinedTextField(
-            value = uiState.googleDrivePath,
-            onValueChange = onGoogleDrivePathChanged,
+        Spacer(Modifier.height(18.dp))
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag(GoogleDrivePathInputTag)
-                .semantics { contentDescription = "Google Driveフォルダパス" },
-            enabled = !uiState.isLoading && !uiState.isSaving,
-            label = { Text("DRIVE PATH") },
-            placeholder = { Text("ORION/Incoming") },
-            supportingText = {
-                Text("例: ORION/Incoming  //  空欄を保存すると設定を解除")
-            },
-            singleLine = true,
-            shape = CutCornerShape(topStart = 10.dp, bottomEnd = 10.dp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (uiState.canSave) onSave()
-                },
-            ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = OrionCyan,
-                unfocusedBorderColor = OrionCyanMuted,
-                focusedLabelColor = OrionCyan,
-                unfocusedLabelColor = OrionTextMuted,
-                cursorColor = OrionCyan,
-                focusedContainerColor = OrionPanelElevated.copy(alpha = 0.45f),
-                unfocusedContainerColor = OrionPanelElevated.copy(alpha = 0.25f),
-                disabledContainerColor = OrionPanelElevated.copy(alpha = 0.2f),
-            ),
-        )
-        Spacer(modifier = Modifier.height(18.dp))
+                .border(1.dp, OrionCyanMuted.copy(alpha = 0.7f))
+                .background(OrionPanelElevated.copy(alpha = 0.35f))
+                .padding(14.dp),
+        ) {
+            Text("SELECTED TARGET", color = OrionTextMuted, fontSize = 9.sp, letterSpacing = 1.sp)
+            Spacer(Modifier.height(5.dp))
+            Text(
+                uiState.driveTarget?.displayPath ?: "NOT CONFIGURED",
+                color = if (uiState.driveTarget == null) OrionAmber else MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        Spacer(Modifier.height(16.dp))
         Button(
-            onClick = onSave,
+            onClick = onSelectFolder,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 52.dp)
-                .testTag(SaveSettingsButtonTag)
-                .semantics { contentDescription = "Google Driveパスを保存" },
-            enabled = uiState.canSave,
-            shape = CutCornerShape(topStart = 10.dp, bottomEnd = 10.dp),
+                .testTag(SelectDriveFolderButtonTag)
+                .semantics { contentDescription = "Google Driveフォルダを選択" },
+            enabled = uiState.canSelectFolder,
+            shape = ActionShape,
             colors = ButtonDefaults.buttonColors(
                 containerColor = OrionCyan,
                 contentColor = OrionDeepNavy,
                 disabledContainerColor = OrionCyanMuted.copy(alpha = 0.35f),
-                disabledContentColor = OrionTextMuted,
             ),
         ) {
-            if (uiState.isSaving) {
-                CircularProgressIndicator(
-                    modifier = Modifier.height(18.dp),
-                    color = OrionDeepNavy,
-                    strokeWidth = 2.dp,
-                )
+            if (uiState.isSelectingFolder) {
+                CircularProgressIndicator(modifier = Modifier.height(18.dp), strokeWidth = 2.dp)
             } else {
-                Text(
-                    text = "[ SAVE CONFIG ]",
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp,
-                )
+                Text("[ SELECT DRIVE FOLDER ]", fontWeight = FontWeight.Bold)
+            }
+        }
+        if (uiState.driveTarget != null) {
+            Spacer(Modifier.height(10.dp))
+            Button(
+                onClick = onClearFolder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .testTag(ClearDriveFolderButtonTag)
+                    .semantics { contentDescription = "Google Driveフォルダ設定を解除" },
+                enabled = uiState.canClear,
+                shape = ActionShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = OrionAmber,
+                    disabledContainerColor = Color.Transparent,
+                ),
+            ) {
+                Text("[ CLEAR TARGET ]", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -236,138 +254,55 @@ private fun DriveTargetPanel(
 @Composable
 private fun SettingsStatusPanel(uiState: SettingsUiState) {
     val status = settingsStatus(uiState)
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, status.color.copy(alpha = 0.75f))
             .background(OrionPanelElevated.copy(alpha = 0.48f))
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .padding(16.dp)
             .semantics { contentDescription = "設定状態: ${status.message}" },
     ) {
-        Text(
-            text = status.code,
-            color = status.color,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.2.sp,
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = status.message,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        Text(status.code, color = status.color, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(6.dp))
+        Text(status.message, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
-private data class SettingsStatus(
-    val code: String,
-    val message: String,
-    val color: Color,
-)
+private data class SettingsStatus(val code: String, val message: String, val color: Color)
 
 private fun settingsStatus(uiState: SettingsUiState): SettingsStatus = when {
-    uiState.isLoading -> SettingsStatus(
-        code = "CONFIG DATA // LOADING",
-        message = "保存済み設定を読み込んでいます。",
-        color = OrionCyan,
-    )
-    uiState.isSaving -> SettingsStatus(
-        code = "LOCAL WRITE // PROCESSING",
-        message = "Google Driveパスを端末へ保存しています。",
-        color = OrionCyan,
-    )
-    uiState.feedback == SettingsFeedback.Saved -> SettingsStatus(
-        code = "LOCAL WRITE // COMPLETE",
-        message = "Google Driveパスを保存しました。",
-        color = OrionCyan,
-    )
-    uiState.feedback == SettingsFeedback.Cleared -> SettingsStatus(
-        code = "DRIVE TARGET // CLEARED",
-        message = "Google Driveパスの設定を解除しました。",
-        color = OrionAmber,
-    )
-    uiState.feedback == SettingsFeedback.SaveFailed -> SettingsStatus(
-        code = "LOCAL WRITE // ERROR",
-        message = "保存できませんでした。入力内容を維持したまま再試行できます。",
-        color = OrionError,
-    )
-    uiState.feedback == SettingsFeedback.LoadFailed -> SettingsStatus(
-        code = "CONFIG DATA // ERROR",
-        message = "保存済み設定を読み込めませんでした。パスを入力して再保存できます。",
-        color = OrionError,
-    )
-    uiState.savedGoogleDrivePath == null -> SettingsStatus(
-        code = "DRIVE TARGET // NOT CONFIGURED",
-        message = "Google Driveフォルダは未設定です。",
-        color = OrionAmber,
-    )
-    else -> SettingsStatus(
-        code = "DRIVE TARGET // LOCAL CACHE READY",
-        message = "保存済みのGoogle Driveフォルダを使用します。",
-        color = OrionCyan,
-    )
+    uiState.isLoading -> SettingsStatus("CONFIG DATA // LOADING", "保存済み設定を読み込んでいます。", OrionCyan)
+    uiState.isSelectingFolder -> SettingsStatus("DRIVE AUTH // ACTIVE", "Google Driveのフォルダ選択を完了してください。", OrionCyan)
+    uiState.isClearing -> SettingsStatus("DRIVE TARGET // CLEARING", "接続設定を解除しています。", OrionCyan)
+    uiState.feedback == SettingsFeedback.FolderSaved -> SettingsStatus("DRIVE TARGET // CONNECTED", "対象フォルダを保存しました。取得はIncoming画面から手動実行します。", OrionCyan)
+    uiState.feedback == SettingsFeedback.Cleared -> SettingsStatus("DRIVE TARGET // CLEARED", "Google Driveフォルダの設定を解除しました。", OrionAmber)
+    uiState.feedback == SettingsFeedback.SelectionFailed -> SettingsStatus("DRIVE AUTH // ERROR", "フォルダを設定できませんでした。再試行してください。", OrionError)
+    uiState.feedback == SettingsFeedback.LoadFailed -> SettingsStatus("CONFIG DATA // ERROR", "保存済み設定を読み込めませんでした。", OrionError)
+    uiState.driveTarget == null -> SettingsStatus("DRIVE TARGET // NOT CONFIGURED", "Google Driveフォルダは未設定です。", OrionAmber)
+    else -> SettingsStatus("DRIVE TARGET // READY", "自動通信は行いません。Incoming画面のSYNCで取得します。", OrionCyan)
 }
+
+private val PanelShape = CutCornerShape(topStart = 18.dp, bottomEnd = 18.dp)
+private val ActionShape = CutCornerShape(topStart = 10.dp, bottomEnd = 10.dp)
 
 @Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
 @Composable
 private fun SettingsScreenUnsetPreview() {
-    OrionTheme {
-        SettingsScreen(
-            uiState = SettingsUiState(isLoading = false),
-            onGoogleDrivePathChanged = {},
-            onSave = {},
-        )
-    }
+    OrionTheme { SettingsScreen(SettingsUiState(isLoading = false), {}, {}) }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
 @Composable
-private fun SettingsScreenSavedPreview() {
+private fun SettingsScreenConnectedPreview() {
     OrionTheme {
         SettingsScreen(
-            uiState = SettingsUiState(
-                googleDrivePath = "ORION/Incoming",
-                savedGoogleDrivePath = "ORION/Incoming",
+            SettingsUiState(
+                driveTarget = GoogleDriveTarget("folder-id", "ORION/Incoming"),
                 isLoading = false,
-                feedback = SettingsFeedback.Saved,
+                feedback = SettingsFeedback.FolderSaved,
             ),
-            onGoogleDrivePathChanged = {},
-            onSave = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun SettingsScreenSavingPreview() {
-    OrionTheme {
-        SettingsScreen(
-            uiState = SettingsUiState(
-                googleDrivePath = "ORION/Incoming",
-                isLoading = false,
-                isSaving = true,
-            ),
-            onGoogleDrivePathChanged = {},
-            onSave = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun SettingsScreenErrorPreview() {
-    OrionTheme {
-        SettingsScreen(
-            uiState = SettingsUiState(
-                googleDrivePath = "ORION/Incoming",
-                savedGoogleDrivePath = "ORION/Old",
-                isLoading = false,
-                feedback = SettingsFeedback.SaveFailed,
-            ),
-            onGoogleDrivePathChanged = {},
-            onSave = {},
+            {},
+            {},
         )
     }
 }

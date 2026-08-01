@@ -18,6 +18,10 @@ import androidx.navigation.compose.rememberNavController
 import jp.hotdrop.orion.data.archive.KnowledgeArchiveDraft
 import jp.hotdrop.orion.data.archive.KnowledgeArchiveEntry
 import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
+import jp.hotdrop.orion.data.incoming.GoogleDriveFile
+import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRecord
+import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
 import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.navigation.OrionNavHost
@@ -34,6 +38,8 @@ import kotlinx.coroutines.flow.flowOf
 fun OrionRoot(
     settingsRepository: SettingsRepository,
     knowledgeArchiveRepository: KnowledgeArchiveRepository,
+    incomingIntelligenceRepository: IncomingIntelligenceRepository,
+    googleDriveRemoteDataSource: GoogleDriveRemoteDataSource,
     modifier: Modifier = Modifier,
     viewModel: OrionViewModel = viewModel(),
 ) {
@@ -44,6 +50,8 @@ fun OrionRoot(
         onDestinationSelected = viewModel::selectDestination,
         settingsRepository = settingsRepository,
         knowledgeArchiveRepository = knowledgeArchiveRepository,
+        incomingIntelligenceRepository = incomingIntelligenceRepository,
+        googleDriveRemoteDataSource = googleDriveRemoteDataSource,
         modifier = modifier,
     )
 }
@@ -54,6 +62,8 @@ internal fun OrionAppShell(
     onDestinationSelected: (OrionTopLevelDestination) -> Unit,
     settingsRepository: SettingsRepository,
     knowledgeArchiveRepository: KnowledgeArchiveRepository,
+    incomingIntelligenceRepository: IncomingIntelligenceRepository,
+    googleDriveRemoteDataSource: GoogleDriveRemoteDataSource,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -110,6 +120,8 @@ internal fun OrionAppShell(
             startDestination = selectedDestination,
             settingsRepository = settingsRepository,
             knowledgeArchiveRepository = knowledgeArchiveRepository,
+            incomingIntelligenceRepository = incomingIntelligenceRepository,
+            googleDriveRemoteDataSource = googleDriveRemoteDataSource,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -130,14 +142,18 @@ private fun OrionRootPreview() {
             onDestinationSelected = {},
             settingsRepository = PreviewSettingsRepository,
             knowledgeArchiveRepository = PreviewKnowledgeArchiveRepository,
+            incomingIntelligenceRepository = PreviewIncomingIntelligenceRepository,
+            googleDriveRemoteDataSource = PreviewGoogleDriveRemoteDataSource,
         )
     }
 }
 
 private val PreviewSettingsRepository = object : SettingsRepository {
-    override fun observeGoogleDrivePath() = kotlinx.coroutines.flow.flowOf<String?>(null)
+    override fun observeDriveTarget() = kotlinx.coroutines.flow.flowOf<jp.hotdrop.orion.data.settings.GoogleDriveTarget?>(null)
 
-    override suspend fun setGoogleDrivePath(rawPath: String) = Unit
+    override suspend fun setDriveTarget(target: jp.hotdrop.orion.data.settings.GoogleDriveTarget) = Unit
+
+    override suspend fun clearDriveTarget() = Unit
 }
 
 private val PreviewKnowledgeArchiveRepository = object : KnowledgeArchiveRepository {
@@ -148,4 +164,28 @@ private val PreviewKnowledgeArchiveRepository = object : KnowledgeArchiveReposit
     override suspend fun saveEntry(id: Long?, draft: KnowledgeArchiveDraft): Long = 1L
 
     override suspend fun deleteEntry(id: Long) = Unit
+}
+
+private val PreviewIncomingIntelligenceRepository = object : IncomingIntelligenceRepository {
+    override fun observeDocuments(rootFolderId: String): Flow<List<IncomingIntelligenceRecord>> =
+        flowOf(emptyList())
+
+    override fun observeLastSyncedAt(rootFolderId: String): Flow<Long?> = flowOf(null)
+
+    override suspend fun synchronize(rootFolderId: String, accessToken: String) = Unit
+
+    override suspend fun markOpened(rootFolderId: String, driveFileId: String) = Unit
+}
+
+private val PreviewGoogleDriveRemoteDataSource = object : GoogleDriveRemoteDataSource {
+    override suspend fun getFolder(accessToken: String, folderId: String) = GoogleDriveFile(
+        id = folderId,
+        name = "ORION/Incoming",
+        mimeType = "application/vnd.google-apps.folder",
+        modifiedAt = 0,
+        webViewLink = null,
+    )
+
+    override suspend fun listChildren(accessToken: String, folderId: String) =
+        emptyList<GoogleDriveFile>()
 }

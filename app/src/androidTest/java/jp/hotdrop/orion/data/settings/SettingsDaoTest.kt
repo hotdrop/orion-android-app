@@ -31,15 +31,15 @@ class SettingsDaoTest {
 
     @Test
     fun settings_canBeObservedUpdatedAndDeleted() = runBlocking {
-        assertNull(dao.observeGoogleDrivePath().first())
+        assertNull(dao.observeSettings().first())
 
-        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Incoming"))
-        assertEquals("ORION/Incoming", dao.observeGoogleDrivePath().first())
+        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Incoming", googleDriveFolderId = "folder-1"))
+        assertEquals("folder-1", dao.observeSettings().first()?.googleDriveFolderId)
 
-        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Reports"))
-        assertEquals("ORION/Reports", dao.observeGoogleDrivePath().first())
+        dao.upsert(SettingsEntity(googleDrivePath = "ORION/Reports", googleDriveFolderId = "folder-2"))
+        assertEquals("ORION/Reports", dao.observeSettings().first()?.googleDrivePath)
 
         dao.delete()
-        assertNull(dao.observeGoogleDrivePath().first())
+        assertNull(dao.observeSettings().first())
     }
 }

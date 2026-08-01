@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SettingsDao {
-    @Query("SELECT google_drive_path FROM settings WHERE id = :id LIMIT 1")
-    fun observeGoogleDrivePath(id: Int = SettingsEntity.SingletonId): Flow<String?>
+    @Query("SELECT * FROM settings WHERE id = :id LIMIT 1")
+    fun observeSettings(id: Int = SettingsEntity.SingletonId): Flow<SettingsEntity?>
 
     @Upsert
     suspend fun upsert(settings: SettingsEntity)

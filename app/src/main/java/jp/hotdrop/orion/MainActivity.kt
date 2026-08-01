@@ -16,6 +16,8 @@ class MainActivity : ComponentActivity() {
                 OrionRoot(
                     settingsRepository = (application as OrionApplication).settingsRepository,
                     knowledgeArchiveRepository = (application as OrionApplication).knowledgeArchiveRepository,
+                    incomingIntelligenceRepository = (application as OrionApplication).incomingIntelligenceRepository,
+                    googleDriveRemoteDataSource = (application as OrionApplication).googleDriveRemoteDataSource,
                 )
             }
         }

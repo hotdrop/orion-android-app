@@ -9,11 +9,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import jp.hotdrop.orion.data.archive.KnowledgeArchiveRepository
+import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.incoming.IncomingIntelligenceRepository
 import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveEditorRoute
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveRoute
-import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceScreen
-import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceUiState
+import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceRoute
 import jp.hotdrop.orion.ui.settings.SettingsRoute
 
 @Composable
@@ -22,6 +23,8 @@ fun OrionNavHost(
     startDestination: OrionTopLevelDestination,
     settingsRepository: SettingsRepository,
     knowledgeArchiveRepository: KnowledgeArchiveRepository,
+    incomingIntelligenceRepository: IncomingIntelligenceRepository,
+    googleDriveRemoteDataSource: GoogleDriveRemoteDataSource,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -30,15 +33,14 @@ fun OrionNavHost(
         modifier = modifier,
     ) {
         composable(OrionTopLevelDestination.Incoming.route) {
-            IncomingIntelligenceScreen(
-                uiState = IncomingIntelligenceUiState(),
-                onSync = {},
+            IncomingIntelligenceRoute(
+                settingsRepository = settingsRepository,
+                incomingRepository = incomingIntelligenceRepository,
                 onOpenSettings = {
                     navController.navigate(OrionDestination.SettingsRoute) {
                         launchSingleTop = true
                     }
                 },
-                onOpenDocument = {},
                 modifier = Modifier,
             )
         }
@@ -80,6 +82,7 @@ fun OrionNavHost(
         composable(OrionDestination.SettingsRoute) {
             SettingsRoute(
                 settingsRepository = settingsRepository,
+                driveRemoteDataSource = googleDriveRemoteDataSource,
                 modifier = Modifier,
             )
         }

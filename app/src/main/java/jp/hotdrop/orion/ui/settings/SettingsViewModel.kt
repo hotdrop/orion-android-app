@@ -7,8 +7,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
 import java.util.logging.Level
 import java.util.logging.Logger
+import jp.hotdrop.orion.data.incoming.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.settings.GoogleDriveTarget
 import jp.hotdrop.orion.data.settings.SettingsRepository
-import jp.hotdrop.orion.data.settings.normalizeGoogleDrivePath
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,129 +20,132 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
-    val googleDrivePath: String = "",
-    val savedGoogleDrivePath: String? = null,
+    val driveTarget: GoogleDriveTarget? = null,
     val isLoading: Boolean = true,
-    val isSaving: Boolean = false,
+    val isSelectingFolder: Boolean = false,
+    val isClearing: Boolean = false,
     val feedback: SettingsFeedback = SettingsFeedback.None,
 ) {
-    val isDirty: Boolean
-        get() = googleDrivePath != savedGoogleDrivePath.orEmpty()
+    val canSelectFolder: Boolean
+        get() = !isLoading && !isSelectingFolder && !isClearing
 
-    val canSave: Boolean
-        get() = !isLoading && !isSaving && isDirty
+    val canClear: Boolean
+        get() = driveTarget != null && canSelectFolder
 }
 
 enum class SettingsFeedback {
     None,
-    Saved,
+    FolderSaved,
     Cleared,
-    SaveFailed,
+    SelectionFailed,
     LoadFailed,
 }
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
+    private val driveRemoteDataSource: GoogleDriveRemoteDataSource,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     init {
-        observeGoogleDrivePath()
+        observeDriveTarget()
     }
 
-    fun onGoogleDrivePathChanged(path: String) {
-        _uiState.update { state ->
-            state.copy(
-                googleDrivePath = path,
-                feedback = SettingsFeedback.None,
-            )
+    fun beginFolderSelection(): Boolean {
+        if (!_uiState.value.canSelectFolder) return false
+        _uiState.update {
+            it.copy(isSelectingFolder = true, feedback = SettingsFeedback.None)
         }
+        return true
     }
 
-    fun save() {
-        val state = _uiState.value
-        if (!state.canSave) return
-
-        val pathToSave = state.googleDrivePath
-        _uiState.update { currentState ->
-            currentState.copy(
-                isSaving = true,
-                feedback = SettingsFeedback.None,
-            )
-        }
-
+    fun saveSelectedFolder(accessToken: String, folderId: String) {
+        if (!_uiState.value.isSelectingFolder) return
         viewModelScope.launch {
             try {
-                settingsRepository.setGoogleDrivePath(pathToSave)
-                val normalizedPath = normalizeGoogleDrivePath(pathToSave)
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        googleDrivePath = normalizedPath,
-                        savedGoogleDrivePath = normalizedPath.ifEmpty { null },
-                        isSaving = false,
-                        feedback = if (normalizedPath.isEmpty()) {
-                            SettingsFeedback.Cleared
-                        } else {
-                            SettingsFeedback.Saved
-                        },
+                val folder = driveRemoteDataSource.getFolder(accessToken, folderId)
+                check(folder.mimeType == GoogleDriveFolderMimeType) {
+                    "The selected Drive item is not a folder"
+                }
+                val target = GoogleDriveTarget(folderId = folder.id, displayPath = folder.name)
+                settingsRepository.setDriveTarget(target)
+                _uiState.update {
+                    it.copy(
+                        driveTarget = target,
+                        isSelectingFolder = false,
+                        feedback = SettingsFeedback.FolderSaved,
                     )
                 }
+            } catch (error: CancellationException) {
+                throw error
             } catch (error: Exception) {
-                Logger.getLogger(SettingsViewModel::class.java.name).log(
-                    Level.SEVERE,
-                    "Failed to save the Google Drive path",
-                    error,
-                )
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isSaving = false,
-                        feedback = SettingsFeedback.SaveFailed,
+                logFailure("Failed to save the selected Google Drive folder", error)
+                reportFolderSelectionFailure()
+            }
+        }
+    }
+
+    fun reportFolderSelectionFailure() {
+        _uiState.update {
+            it.copy(
+                isSelectingFolder = false,
+                feedback = SettingsFeedback.SelectionFailed,
+            )
+        }
+    }
+
+    fun clearDriveTarget() {
+        if (!_uiState.value.canClear) return
+        _uiState.update { it.copy(isClearing = true, feedback = SettingsFeedback.None) }
+        viewModelScope.launch {
+            try {
+                settingsRepository.clearDriveTarget()
+                _uiState.update {
+                    it.copy(
+                        driveTarget = null,
+                        isClearing = false,
+                        feedback = SettingsFeedback.Cleared,
                     )
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                logFailure("Failed to clear the Google Drive folder", error)
+                _uiState.update {
+                    it.copy(isClearing = false, feedback = SettingsFeedback.SelectionFailed)
                 }
             }
         }
     }
 
-    private fun observeGoogleDrivePath() {
+    private fun observeDriveTarget() {
         viewModelScope.launch {
-            settingsRepository.observeGoogleDrivePath()
+            settingsRepository.observeDriveTarget()
                 .catch { error ->
-                    Logger.getLogger(SettingsViewModel::class.java.name).log(
-                        Level.SEVERE,
-                        "Failed to load the Google Drive path",
-                        error,
-                    )
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            feedback = SettingsFeedback.LoadFailed,
-                        )
+                    logFailure("Failed to load the Google Drive target", error)
+                    _uiState.update {
+                        it.copy(isLoading = false, feedback = SettingsFeedback.LoadFailed)
                     }
                 }
-                .collect { savedPath ->
-                    _uiState.update { state ->
-                        val shouldRefreshDraft = state.isLoading || !state.isDirty
-                        state.copy(
-                            googleDrivePath = if (shouldRefreshDraft) {
-                                savedPath.orEmpty()
-                            } else {
-                                state.googleDrivePath
-                            },
-                            savedGoogleDrivePath = savedPath,
-                            isLoading = false,
-                        )
-                    }
+                .collect { target ->
+                    _uiState.update { it.copy(driveTarget = target, isLoading = false) }
                 }
         }
+    }
+
+    private fun logFailure(message: String, error: Throwable) {
+        Logger.getLogger(SettingsViewModel::class.java.name).log(Level.SEVERE, message, error)
     }
 
     companion object {
-        fun factory(settingsRepository: SettingsRepository): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    SettingsViewModel(settingsRepository)
-                }
+        fun factory(
+            settingsRepository: SettingsRepository,
+            driveRemoteDataSource: GoogleDriveRemoteDataSource,
+        ): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                SettingsViewModel(settingsRepository, driveRemoteDataSource)
             }
+        }
     }
 }

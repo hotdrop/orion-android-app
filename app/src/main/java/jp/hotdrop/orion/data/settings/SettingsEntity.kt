@@ -10,6 +10,8 @@ data class SettingsEntity(
     val id: Int = SingletonId,
     @ColumnInfo(name = "google_drive_path")
     val googleDrivePath: String,
+    @ColumnInfo(name = "google_drive_folder_id")
+    val googleDriveFolderId: String? = null,
 ) {
     companion object {
         const val SingletonId = 1

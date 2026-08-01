@@ -1,7 +1,10 @@
 package jp.hotdrop.orion.ui.settings
 
+import jp.hotdrop.orion.data.incoming.GoogleDriveFile
+import jp.hotdrop.orion.data.incoming.GoogleDriveFolderMimeType
+import jp.hotdrop.orion.data.incoming.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.settings.GoogleDriveTarget
 import jp.hotdrop.orion.data.settings.SettingsRepository
-import jp.hotdrop.orion.data.settings.normalizeGoogleDrivePath
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +12,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -19,90 +21,78 @@ class SettingsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun initialPath_isLoadedFromRepository() = runTest {
-        val repository = FakeSettingsRepository(initialPath = "ORION/Incoming")
-        val viewModel = SettingsViewModel(repository)
+    fun initialTarget_isLoadedWithoutStartingNetworkAccess() = runTest {
+        val target = GoogleDriveTarget("folder-1", "ORION/Incoming")
+        val repository = FakeSettingsRepository(target)
+        val remote = FakeDriveRemoteDataSource()
+        val viewModel = SettingsViewModel(repository, remote)
 
         advanceUntilIdle()
 
-        assertEquals("ORION/Incoming", viewModel.uiState.value.googleDrivePath)
+        assertEquals(target, viewModel.uiState.value.driveTarget)
         assertFalse(viewModel.uiState.value.isLoading)
-        assertFalse(viewModel.uiState.value.isDirty)
+        assertEquals(0, remote.getFolderCalls)
     }
 
     @Test
-    fun save_normalizesPathAndReportsSuccess() = runTest {
+    fun selectedFolder_fetchesNameAndPersistsTarget() = runTest {
         val repository = FakeSettingsRepository()
-        val viewModel = SettingsViewModel(repository)
+        val remote = FakeDriveRemoteDataSource(folderName = "Weekly Reports")
+        val viewModel = SettingsViewModel(repository, remote)
         advanceUntilIdle()
 
-        viewModel.onGoogleDrivePathChanged(" /ORION/Incoming/ ")
-        viewModel.save()
+        viewModel.beginFolderSelection()
+        viewModel.saveSelectedFolder("token", "folder-1")
         advanceUntilIdle()
 
-        assertEquals(listOf(" /ORION/Incoming/ "), repository.savedRawPaths)
-        assertEquals("ORION/Incoming", viewModel.uiState.value.googleDrivePath)
-        assertEquals(SettingsFeedback.Saved, viewModel.uiState.value.feedback)
-        assertFalse(viewModel.uiState.value.isDirty)
+        assertEquals(GoogleDriveTarget("folder-1", "Weekly Reports"), repository.target.value)
+        assertEquals(SettingsFeedback.FolderSaved, viewModel.uiState.value.feedback)
     }
 
     @Test
-    fun save_emptyPathClearsExistingSetting() = runTest {
-        val repository = FakeSettingsRepository(initialPath = "ORION/Incoming")
-        val viewModel = SettingsViewModel(repository)
+    fun clear_removesSelectedTarget() = runTest {
+        val repository = FakeSettingsRepository(GoogleDriveTarget("folder-1", "Incoming"))
+        val viewModel = SettingsViewModel(repository, FakeDriveRemoteDataSource())
         advanceUntilIdle()
 
-        viewModel.onGoogleDrivePathChanged("")
-        viewModel.save()
+        viewModel.clearDriveTarget()
         advanceUntilIdle()
 
+        assertEquals(null, repository.target.value)
         assertEquals(SettingsFeedback.Cleared, viewModel.uiState.value.feedback)
-        assertEquals(null, viewModel.uiState.value.savedGoogleDrivePath)
-        assertFalse(viewModel.uiState.value.isDirty)
-    }
-
-    @Test
-    fun saveFailure_keepsDraftAndAllowsRetry() = runTest {
-        val repository = FakeSettingsRepository(failOnSave = true)
-        val viewModel = SettingsViewModel(repository)
-        advanceUntilIdle()
-
-        viewModel.onGoogleDrivePathChanged("ORION/Incoming")
-        viewModel.save()
-        advanceUntilIdle()
-
-        assertEquals("ORION/Incoming", viewModel.uiState.value.googleDrivePath)
-        assertEquals(SettingsFeedback.SaveFailed, viewModel.uiState.value.feedback)
-        assertTrue(viewModel.uiState.value.canSave)
-    }
-
-    @Test
-    fun repeatedSaveWhileSaving_isIgnored() = runTest {
-        val repository = FakeSettingsRepository()
-        val viewModel = SettingsViewModel(repository)
-        advanceUntilIdle()
-        viewModel.onGoogleDrivePathChanged("ORION/Incoming")
-
-        viewModel.save()
-        viewModel.save()
-        advanceUntilIdle()
-
-        assertEquals(1, repository.savedRawPaths.size)
     }
 }
 
-private class FakeSettingsRepository(
-    initialPath: String? = null,
-    private val failOnSave: Boolean = false,
-) : SettingsRepository {
-    private val path = MutableStateFlow(initialPath)
-    val savedRawPaths = mutableListOf<String>()
+private class FakeSettingsRepository(initialTarget: GoogleDriveTarget? = null) : SettingsRepository {
+    val target = MutableStateFlow(initialTarget)
 
-    override fun observeGoogleDrivePath(): Flow<String?> = path
+    override fun observeDriveTarget(): Flow<GoogleDriveTarget?> = target
 
-    override suspend fun setGoogleDrivePath(rawPath: String) {
-        savedRawPaths += rawPath
-        check(!failOnSave) { "save failed" }
-        path.value = normalizeGoogleDrivePath(rawPath).ifEmpty { null }
+    override suspend fun setDriveTarget(target: GoogleDriveTarget) {
+        this.target.value = target
     }
+
+    override suspend fun clearDriveTarget() {
+        target.value = null
+    }
+}
+
+private class FakeDriveRemoteDataSource(
+    private val folderName: String = "Incoming",
+) : GoogleDriveRemoteDataSource {
+    var getFolderCalls = 0
+
+    override suspend fun getFolder(accessToken: String, folderId: String): GoogleDriveFile {
+        getFolderCalls++
+        return GoogleDriveFile(
+            id = folderId,
+            name = folderName,
+            mimeType = GoogleDriveFolderMimeType,
+            modifiedAt = 0,
+            webViewLink = null,
+        )
+    }
+
+    override suspend fun listChildren(accessToken: String, folderId: String) =
+        emptyList<GoogleDriveFile>()
 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.hotdrop.orion.model.IncomingIntelligenceDocument
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
@@ -47,25 +48,6 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 
 internal const val IncomingSyncButtonTag = "incoming_sync_button"
 internal const val IncomingDocumentListTag = "incoming_document_list"
-
-@Immutable
-data class IncomingIntelligenceDocument(
-    val id: String,
-    val title: String,
-    val updatedAtLabel: String,
-    val relativePath: String,
-    val webUrl: String,
-    val isNew: Boolean,
-)
-
-data class IncomingIntelligenceUiState(
-    val isDriveConfigured: Boolean = false,
-    val documents: List<IncomingIntelligenceDocument> = emptyList(),
-    val isSyncing: Boolean = false,
-    val isOffline: Boolean = false,
-    val errorMessage: String? = null,
-    val lastSyncedAtLabel: String? = null,
-)
 
 @Composable
 fun IncomingIntelligenceScreen(
