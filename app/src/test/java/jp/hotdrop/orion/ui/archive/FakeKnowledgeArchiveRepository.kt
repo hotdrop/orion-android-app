@@ -1,8 +1,8 @@
 package jp.hotdrop.orion.ui.archive
 
-import jp.hotdrop.orion.data.KnowledgeArchiveDraft
-import jp.hotdrop.orion.data.KnowledgeArchiveEntry
 import jp.hotdrop.orion.data.KnowledgeArchiveRepository
+import jp.hotdrop.orion.model.KnowledgeArchiveDraft
+import jp.hotdrop.orion.model.KnowledgeArchiveEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 

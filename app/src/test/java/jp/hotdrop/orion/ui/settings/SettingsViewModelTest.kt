@@ -3,8 +3,8 @@ package jp.hotdrop.orion.ui.settings
 import jp.hotdrop.orion.data.remote.GoogleDriveFile
 import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
-import jp.hotdrop.orion.data.GoogleDriveTarget
 import jp.hotdrop.orion.data.SettingsRepository
+import jp.hotdrop.orion.model.GoogleDriveTarget
 import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
 import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
 import kotlinx.coroutines.ExperimentalCoroutinesApi

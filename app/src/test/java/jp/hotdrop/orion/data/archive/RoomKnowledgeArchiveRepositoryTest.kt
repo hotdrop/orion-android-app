@@ -1,12 +1,12 @@
 package jp.hotdrop.orion.data.archive
 
-import jp.hotdrop.orion.data.KnowledgeArchiveDraft
-import jp.hotdrop.orion.data.KnowledgeArchiveEntry
-import jp.hotdrop.orion.data.KnowledgeArchiveValidationError
 import jp.hotdrop.orion.data.RoomKnowledgeArchiveRepository
 import jp.hotdrop.orion.data.local.dao.KnowledgeArchiveDao
 import jp.hotdrop.orion.data.local.entity.KnowledgeArchiveEntity
 import jp.hotdrop.orion.data.validateKnowledgeArchiveDraft
+import jp.hotdrop.orion.model.KnowledgeArchiveDraft
+import jp.hotdrop.orion.model.KnowledgeArchiveEntry
+import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
