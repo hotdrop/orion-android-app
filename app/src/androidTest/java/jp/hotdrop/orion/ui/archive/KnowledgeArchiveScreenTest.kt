@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import jp.hotdrop.orion.model.KnowledgeArchiveEntry
+import jp.hotdrop.orion.ui.archive.components.list.NewArchiveEntryButtonTag
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveUiState
 import jp.hotdrop.orion.ui.theme.OrionTheme
 import org.junit.Assert.assertEquals

@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.archive.components
+package jp.hotdrop.orion.ui.archive.components.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,11 +20,12 @@ import jp.hotdrop.orion.ui.theme.OrionPanel
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
-fun EditorModuleHeader(
-    isEditing: Boolean
+fun KnowledgeArchiveEditorHeader(
+    isEditing: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(1.dp, OrionCyanMuted, CutCornerShape(topStart = 16.dp, bottomEnd = 16.dp))
             .background(OrionPanel.copy(alpha = 0.82f), CutCornerShape(topStart = 16.dp, bottomEnd = 16.dp))
@@ -48,20 +49,20 @@ fun EditorModuleHeader(
 
 @Preview
 @Composable
-private fun EditorModuleHeaderEditablePreview() {
+private fun KnowledgeArchiveEditorHeaderEditingPreview() {
     OrionTheme {
-        EditorModuleHeader(
-            isEditing = true
+        KnowledgeArchiveEditorHeader(
+            isEditing = true,
         )
     }
 }
 
 @Preview
 @Composable
-private fun EditorModuleHeadernotEditPreview() {
+private fun KnowledgeArchiveEditorHeaderCreatingPreview() {
     OrionTheme {
-        EditorModuleHeader(
-            isEditing = false
+        KnowledgeArchiveEditorHeader(
+            isEditing = false,
         )
     }
 }

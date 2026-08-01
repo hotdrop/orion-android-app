@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.archive.components
+package jp.hotdrop.orion.ui.archive.components.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import jp.hotdrop.orion.model.KnowledgeArchiveEntry
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import jp.hotdrop.orion.ui.theme.OrionPanelElevated
@@ -34,22 +33,25 @@ import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
-fun KnowledgeArchiveCard(
-    entry: KnowledgeArchiveEntry,
+fun KnowledgeArchiveEntryCard(
+    entryId: Long,
+    title: String,
+    memo: String,
     onEdit: () -> Unit,
     onOpenUrl: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(1.dp, OrionCyanMuted.copy(alpha = 0.75f), CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp))
             .background(OrionPanelElevated.copy(alpha = 0.55f), CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp))
             .clickable(role = Role.Button, onClick = onEdit)
-            .semantics { contentDescription = "${entry.title}の記録を編集" }
+            .semantics { contentDescription = "${title}の記録を編集" }
             .padding(16.dp),
     ) {
         Text(
-            text = "ARCHIVE RECORD // ${entry.id.toString().padStart(4, '0')}",
+            text = "ARCHIVE RECORD // ${entryId.toString().padStart(4, '0')}",
             color = OrionCyan,
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
@@ -57,17 +59,17 @@ fun KnowledgeArchiveCard(
         )
         Spacer(modifier = Modifier.height(7.dp))
         Text(
-            text = entry.title,
+            text = title,
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        if (entry.memo.isNotEmpty()) {
+        if (memo.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = entry.memo,
+                text = memo,
                 color = OrionTextMuted,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 3,
@@ -81,13 +83,13 @@ fun KnowledgeArchiveCard(
         ) {
             ArchiveCardAction(
                 label = "OPEN LINK",
-                accessibilityLabel = "${entry.title}のURLを開く",
+                accessibilityLabel = "${title}のURLを開く",
                 onClick = onOpenUrl,
                 modifier = Modifier.weight(1f),
             )
             ArchiveCardAction(
                 label = "EDIT",
-                accessibilityLabel = "${entry.title}を編集",
+                accessibilityLabel = "${title}を編集",
                 onClick = onEdit,
                 modifier = Modifier.weight(1f),
             )
@@ -122,19 +124,26 @@ private fun ArchiveCardAction(
 
 @Preview(showBackground = true)
 @Composable
-private fun KnowledgeArchiveCardPreview() {
+private fun ArchiveCardActionPreview() {
     OrionTheme {
-        KnowledgeArchiveCard(
-            entry = KnowledgeArchiveEntry(
-                id = 1,
-                title = "テスト",
-                url = "",
-                memo = "テストメモ",
-                createdAt = 1222222222,
-                updatedAt = 1222222222
-            ),
+        ArchiveCardAction(
+            label = "OPEN LINK",
+            accessibilityLabel = "記事のURLを開く",
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun KnowledgeArchiveEntryCardPreview() {
+    OrionTheme {
+        KnowledgeArchiveEntryCard(
+            entryId = 1,
+            title = "テスト",
+            memo = "テストメモ",
             onEdit = {},
-            onOpenUrl = {}
+            onOpenUrl = {},
         )
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import jp.hotdrop.orion.model.KnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.ui.archive.components.editor.SaveArchiveEntryButtonTag
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import jp.hotdrop.orion.ui.theme.OrionTheme
 import org.junit.Assert.assertTrue
