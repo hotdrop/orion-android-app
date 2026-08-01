@@ -3,6 +3,7 @@ package jp.hotdrop.orion.ui
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -101,7 +102,12 @@ internal fun OrionAppShell(
             }
         },
     ) { innerPadding ->
-        navHost(navController, Modifier.padding(innerPadding))
+        navHost(
+            navController,
+            Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
+        )
     }
 }
 

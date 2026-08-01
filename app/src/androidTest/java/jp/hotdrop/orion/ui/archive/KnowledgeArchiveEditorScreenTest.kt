@@ -2,12 +2,17 @@ package jp.hotdrop.orion.ui.archive
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import jp.hotdrop.orion.model.KnowledgeArchiveDraft
 import jp.hotdrop.orion.model.KnowledgeArchiveValidationError
+import jp.hotdrop.orion.ui.archive.components.editor.ArchiveMemoInputTag
+import jp.hotdrop.orion.ui.archive.components.editor.ArchiveTitleInputTag
+import jp.hotdrop.orion.ui.archive.components.editor.ArchiveUrlInputTag
 import jp.hotdrop.orion.ui.archive.components.editor.SaveArchiveEntryButtonTag
 import jp.hotdrop.orion.ui.archive.uistate.KnowledgeArchiveEditorUiState
 import jp.hotdrop.orion.ui.theme.OrionTheme
@@ -104,5 +109,34 @@ class KnowledgeArchiveEditorScreenTest {
         composeRule.onNodeWithText("DISCARD CHANGES?").assertIsDisplayed()
         composeRule.onNodeWithText("[ DISCARD ]").performClick()
         assertTrue(discardConfirmed)
+    }
+
+    @Test
+    fun inputFields_receiveFocusAndRemainVisible() {
+        composeRule.setContent {
+            OrionTheme {
+                KnowledgeArchiveEditorScreen(
+                    uiState = KnowledgeArchiveEditorUiState(),
+                    onTitleChanged = {},
+                    onUrlChanged = {},
+                    onMemoChanged = {},
+                    onSave = {},
+                    onRequestDelete = {},
+                    onDismissDiscard = {},
+                    onConfirmDiscard = {},
+                    onDismissDelete = {},
+                    onConfirmDelete = {},
+                )
+            }
+        }
+
+        listOf(ArchiveTitleInputTag, ArchiveUrlInputTag, ArchiveMemoInputTag).forEach { tag ->
+            composeRule
+                .onNodeWithTag(tag)
+                .performScrollTo()
+                .performClick()
+                .assertIsFocused()
+                .assertIsDisplayed()
+        }
     }
 }
