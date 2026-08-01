@@ -1,3 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">orion</string>
+
+    <string name="settings_module_code">MODULE // CFG</string>
+    <string name="settings_module_title">LOCAL CONFIGURATION NODE</string>
+    <string name="settings_module_state">ONLINE</string>
+
+    <string name="settings_drive_panel_title">GOOGLE DRIVE // TARGET DIRECTORY</string>
+    <string name="settings_drive_panel_description">Incoming Intelligenceを手動取得する基準フォルダを選択します。自動同期は行いません。</string>
+    <string name="settings_drive_target_label">SELECTED TARGET</string>
+    <string name="settings_drive_target_loading">LOADING…</string>
+    <string name="settings_drive_target_unset">NOT CONFIGURED</string>
+    <string name="settings_select_folder_action">[ SELECT DRIVE FOLDER ]</string>
+    <string name="settings_clear_folder_action">[ CLEAR TARGET ]</string>
+    <string name="settings_select_folder_content_description">Google Driveフォルダを選択</string>
+    <string name="settings_clear_folder_content_description">Google Driveフォルダ設定を解除</string>
+
+    <string name="settings_status_content_description">設定状態: %1$s</string>
+    <string name="settings_status_loading_code">CONFIG DATA // LOADING</string>
+    <string name="settings_status_loading_message">保存済み設定を読み込んでいます。</string>
+    <string name="settings_status_selecting_code">DRIVE AUTH // ACTIVE</string>
+    <string name="settings_status_selecting_message">Google Driveのフォルダ選択を完了してください。</string>
+    <string name="settings_status_clearing_code">DRIVE TARGET // CLEARING</string>
+    <string name="settings_status_clearing_message">接続設定を解除しています。</string>
+    <string name="settings_status_saved_code">DRIVE TARGET // CONNECTED</string>
+    <string name="settings_status_saved_message">対象フォルダを保存しました。取得はIncoming画面から手動実行します。</string>
+    <string name="settings_status_cleared_code">DRIVE TARGET // CLEARED</string>
+    <string name="settings_status_cleared_message">Google Driveフォルダの設定を解除しました。</string>
+    <string name="settings_status_selection_failed_code">DRIVE AUTH // ERROR</string>
+    <string name="settings_status_selection_failed_message">フォルダを設定できませんでした。再試行してください。</string>
+    <string name="settings_status_clear_failed_code">DRIVE TARGET // ERROR</string>
+    <string name="settings_status_clear_failed_message">Google Driveフォルダの設定を解除できませんでした。再試行してください。</string>
+    <string name="settings_status_load_failed_code">CONFIG DATA // ERROR</string>
+    <string name="settings_status_load_failed_message">保存済み設定を読み込めませんでした。</string>
+    <string name="settings_status_not_configured_code">DRIVE TARGET // NOT CONFIGURED</string>
+    <string name="settings_status_not_configured_message">Google Driveフォルダは未設定です。</string>
+    <string name="settings_status_ready_code">DRIVE TARGET // READY</string>
+    <string name="settings_status_ready_message">自動通信は行いません。Incoming画面のSYNCで取得します。</string>
 </resources>

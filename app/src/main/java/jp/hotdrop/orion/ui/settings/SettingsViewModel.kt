@@ -19,28 +19,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class SettingsUiState(
-    val driveTarget: GoogleDriveTarget? = null,
-    val isLoading: Boolean = true,
-    val isSelectingFolder: Boolean = false,
-    val isClearing: Boolean = false,
-    val feedback: SettingsFeedback = SettingsFeedback.None,
-) {
-    val canSelectFolder: Boolean
-        get() = !isLoading && !isSelectingFolder && !isClearing
-
-    val canClear: Boolean
-        get() = driveTarget != null && canSelectFolder
-}
-
-enum class SettingsFeedback {
-    None,
-    FolderSaved,
-    Cleared,
-    SelectionFailed,
-    LoadFailed,
-}
-
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val driveRemoteDataSource: GoogleDriveRemoteDataSource,
@@ -55,13 +33,29 @@ class SettingsViewModel(
     fun beginFolderSelection(): Boolean {
         if (!_uiState.value.canSelectFolder) return false
         _uiState.update {
-            it.copy(isSelectingFolder = true, feedback = SettingsFeedback.None)
+            it.copy(
+                operation = SettingsOperation.SelectingFolder,
+                feedback = SettingsFeedback.None,
+            )
         }
         return true
     }
 
+    fun cancelFolderSelection() {
+        _uiState.update { state ->
+            if (state.operation != SettingsOperation.SelectingFolder) {
+                state
+            } else {
+                state.copy(
+                    operation = SettingsOperation.Idle,
+                    feedback = SettingsFeedback.None,
+                )
+            }
+        }
+    }
+
     fun saveSelectedFolder(accessToken: String, folderId: String) {
-        if (!_uiState.value.isSelectingFolder) return
+        if (_uiState.value.operation != SettingsOperation.SelectingFolder) return
         viewModelScope.launch {
             try {
                 val folder = driveRemoteDataSource.getFolder(accessToken, folderId)
@@ -70,50 +64,75 @@ class SettingsViewModel(
                 }
                 val target = GoogleDriveTarget(folderId = folder.id, displayPath = folder.name)
                 settingsRepository.setDriveTarget(target)
-                _uiState.update {
-                    it.copy(
-                        driveTarget = target,
-                        isSelectingFolder = false,
-                        feedback = SettingsFeedback.FolderSaved,
-                    )
+                _uiState.update { state ->
+                    if (state.operation != SettingsOperation.SelectingFolder) {
+                        state
+                    } else {
+                        state.copy(
+                            driveTarget = target,
+                            operation = SettingsOperation.Idle,
+                            feedback = SettingsFeedback.FolderSaved,
+                        )
+                    }
                 }
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                logFailure("Failed to save the selected Google Drive folder", error)
-                reportFolderSelectionFailure()
+                reportFolderSelectionFailure(error)
             }
         }
     }
 
-    fun reportFolderSelectionFailure() {
-        _uiState.update {
-            it.copy(
-                isSelectingFolder = false,
-                feedback = SettingsFeedback.SelectionFailed,
-            )
+    fun reportFolderSelectionFailure(error: Throwable? = null) {
+        if (_uiState.value.operation != SettingsOperation.SelectingFolder) return
+        error?.let { logFailure("Failed to select a Google Drive folder", it) }
+        _uiState.update { state ->
+            if (state.operation != SettingsOperation.SelectingFolder) {
+                state
+            } else {
+                state.copy(
+                    operation = SettingsOperation.Idle,
+                    feedback = SettingsFeedback.SelectionFailed,
+                )
+            }
         }
     }
 
     fun clearDriveTarget() {
         if (!_uiState.value.canClear) return
-        _uiState.update { it.copy(isClearing = true, feedback = SettingsFeedback.None) }
+        _uiState.update {
+            it.copy(
+                operation = SettingsOperation.Clearing,
+                feedback = SettingsFeedback.None,
+            )
+        }
         viewModelScope.launch {
             try {
                 settingsRepository.clearDriveTarget()
-                _uiState.update {
-                    it.copy(
-                        driveTarget = null,
-                        isClearing = false,
-                        feedback = SettingsFeedback.Cleared,
-                    )
+                _uiState.update { state ->
+                    if (state.operation != SettingsOperation.Clearing) {
+                        state
+                    } else {
+                        state.copy(
+                            driveTarget = null,
+                            operation = SettingsOperation.Idle,
+                            feedback = SettingsFeedback.Cleared,
+                        )
+                    }
                 }
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
                 logFailure("Failed to clear the Google Drive folder", error)
-                _uiState.update {
-                    it.copy(isClearing = false, feedback = SettingsFeedback.SelectionFailed)
+                _uiState.update { state ->
+                    if (state.operation != SettingsOperation.Clearing) {
+                        state
+                    } else {
+                        state.copy(
+                            operation = SettingsOperation.Idle,
+                            feedback = SettingsFeedback.ClearFailed,
+                        )
+                    }
                 }
             }
         }
@@ -125,11 +144,23 @@ class SettingsViewModel(
                 .catch { error ->
                     logFailure("Failed to load the Google Drive target", error)
                     _uiState.update {
-                        it.copy(isLoading = false, feedback = SettingsFeedback.LoadFailed)
+                        it.copy(
+                            operation = SettingsOperation.Idle,
+                            feedback = SettingsFeedback.LoadFailed,
+                        )
                     }
                 }
                 .collect { target ->
-                    _uiState.update { it.copy(driveTarget = target, isLoading = false) }
+                    _uiState.update { state ->
+                        state.copy(
+                            driveTarget = target,
+                            operation = if (state.operation == SettingsOperation.Loading) {
+                                SettingsOperation.Idle
+                            } else {
+                                state.operation
+                            },
+                        )
+                    }
                 }
         }
     }

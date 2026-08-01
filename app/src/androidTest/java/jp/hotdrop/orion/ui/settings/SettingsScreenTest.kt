@@ -2,7 +2,9 @@ package jp.hotdrop.orion.ui.settings
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -17,12 +19,29 @@ class SettingsScreenTest {
     val composeRule = createComposeRule()
 
     @Test
+    fun loading_showsLoadingTargetAndDisablesSelection() {
+        composeRule.setContent {
+            OrionTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(),
+                    onSelectFolder = {},
+                    onClearFolder = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("LOADING…").assertIsDisplayed()
+        composeRule.onNodeWithTag(SelectDriveFolderButtonTag).assertIsNotEnabled()
+        composeRule.onNodeWithText("保存済み設定を読み込んでいます。").assertIsDisplayed()
+    }
+
+    @Test
     fun unsetTarget_showsFolderSelectionAction() {
         var selectClicks = 0
         composeRule.setContent {
             OrionTheme {
                 SettingsScreen(
-                    uiState = SettingsUiState(isLoading = false),
+                    uiState = SettingsUiState(operation = SettingsOperation.Idle),
                     onSelectFolder = { selectClicks++ },
                     onClearFolder = {},
                 )
@@ -42,7 +61,7 @@ class SettingsScreenTest {
                 SettingsScreen(
                     uiState = SettingsUiState(
                         driveTarget = GoogleDriveTarget("folder-1", "ORION/Incoming"),
-                        isLoading = false,
+                        operation = SettingsOperation.Idle,
                     ),
                     onSelectFolder = {},
                     onClearFolder = { clearClicks++ },
@@ -53,5 +72,46 @@ class SettingsScreenTest {
         composeRule.onNodeWithText("ORION/Incoming").assertIsDisplayed()
         composeRule.onNodeWithTag(ClearDriveFolderButtonTag).performClick()
         assertEquals(1, clearClicks)
+    }
+
+    @Test
+    fun selectingFolder_disablesActionAndAnnouncesActiveStatus() {
+        composeRule.setContent {
+            OrionTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(
+                        operation = SettingsOperation.SelectingFolder,
+                    ),
+                    onSelectFolder = {},
+                    onClearFolder = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(SelectDriveFolderButtonTag).assertIsNotEnabled()
+        composeRule.onNodeWithText("DRIVE AUTH // ACTIVE").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Google Driveフォルダを選択").assertIsDisplayed()
+    }
+
+    @Test
+    fun clearFailure_showsDedicatedError() {
+        composeRule.setContent {
+            OrionTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(
+                        driveTarget = GoogleDriveTarget("folder-1", "ORION/Incoming"),
+                        operation = SettingsOperation.Idle,
+                        feedback = SettingsFeedback.ClearFailed,
+                    ),
+                    onSelectFolder = {},
+                    onClearFolder = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("DRIVE TARGET // ERROR").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Google Driveフォルダの設定を解除できませんでした。再試行してください。",
+        ).assertIsDisplayed()
     }
 }
