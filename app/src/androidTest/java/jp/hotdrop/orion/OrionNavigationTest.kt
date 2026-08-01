@@ -4,8 +4,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import jp.hotdrop.orion.ui.settings.GoogleDrivePathInputTag
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,6 +34,7 @@ class OrionNavigationTest {
         composeRule
             .onNodeWithContentDescription("現在の画面: SYSTEM SETTINGS")
             .assertIsDisplayed()
+        composeRule.onNodeWithTag(GoogleDrivePathInputTag).assertIsDisplayed()
 
         composeRule.onNodeWithContentDescription("前の画面へ戻る").performClick()
         composeRule

@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.navigation.OrionNavHost
 import jp.hotdrop.orion.navigation.OrionTopLevelDestination
@@ -25,6 +26,7 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
 fun OrionRoot(
+    settingsRepository: SettingsRepository,
     modifier: Modifier = Modifier,
     viewModel: OrionViewModel = viewModel(),
 ) {
@@ -33,6 +35,7 @@ fun OrionRoot(
     OrionAppShell(
         selectedDestination = selectedDestination,
         onDestinationSelected = viewModel::selectDestination,
+        settingsRepository = settingsRepository,
         modifier = modifier,
     )
 }
@@ -41,6 +44,7 @@ fun OrionRoot(
 internal fun OrionAppShell(
     selectedDestination: OrionTopLevelDestination,
     onDestinationSelected: (OrionTopLevelDestination) -> Unit,
+    settingsRepository: SettingsRepository,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -90,6 +94,7 @@ internal fun OrionAppShell(
         OrionNavHost(
             navController = navController,
             startDestination = selectedDestination,
+            settingsRepository = settingsRepository,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -108,6 +113,13 @@ private fun OrionRootPreview() {
         OrionAppShell(
             selectedDestination = OrionTopLevelDestination.Incoming,
             onDestinationSelected = {},
+            settingsRepository = PreviewSettingsRepository,
         )
     }
+}
+
+private val PreviewSettingsRepository = object : SettingsRepository {
+    override fun observeGoogleDrivePath() = kotlinx.coroutines.flow.flowOf<String?>(null)
+
+    override suspend fun setGoogleDrivePath(rawPath: String) = Unit
 }

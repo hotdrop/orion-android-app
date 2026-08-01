@@ -13,7 +13,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OrionTheme {
-                OrionRoot()
+                OrionRoot(
+                    settingsRepository = (application as OrionApplication).settingsRepository,
+                )
             }
         }
     }

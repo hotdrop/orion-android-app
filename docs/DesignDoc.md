@@ -70,11 +70,20 @@ ORIONの機能は次の2つです。
 - SettingsではGoogleアカウント、Driveフォルダ、サウンド、触覚、演出軽減を設定します。
 - 最初は縦持ちスマートフォン向けの1カラムUIを基準にします。
 
+### Settings
+
+- Google Driveフォルダの論理パスを入力し、明示的な保存操作で端末内のRoomへ保存します。
+- 保存時にはパスの前後にある空白とスラッシュを取り除き、内部の区切りは維持します。
+- 空欄を保存するとDriveフォルダの設定を解除します。
+- 保存中、保存完了、設定解除、読込・保存エラーを画面上で確認できます。
+- Googleアカウント認証、Driveフォルダ選択、サウンド、触覚、演出軽減は今後実装します。
+
 ### 現在の実装状態
 
 - 共通ヘッダー、下部ナビゲーション、Navigation ComposeによるSettingsを含む画面遷移を実装済みです。
 - 通常起動時はIncoming Intelligenceを選択し、画面を再生成しても選択中のタブを維持します。
-- Incoming Intelligence、Knowledge Archive、Settingsの機能本体は未実装で、各画面には「未実装」と表示します。
+- Incoming IntelligenceとKnowledge Archiveの機能本体は未実装で、各画面には「未実装」と表示します。
+- SettingsではGoogle Driveフォルダパスの編集とRoomへの保存を実装済みです。その他の設定項目は未実装です。
 - 各主要画面と共通UIは独立してPreviewでき、画面は外部から状態と操作を受け取る構成にします。
 
 ## 5. UIの世界観

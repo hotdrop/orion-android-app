@@ -6,14 +6,16 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveScreen
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceScreen
-import jp.hotdrop.orion.ui.settings.SettingsScreen
+import jp.hotdrop.orion.ui.settings.SettingsRoute
 
 @Composable
 fun OrionNavHost(
     navController: NavHostController,
     startDestination: OrionTopLevelDestination,
+    settingsRepository: SettingsRepository,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -28,7 +30,10 @@ fun OrionNavHost(
             KnowledgeArchiveScreen(modifier = Modifier)
         }
         composable(OrionDestination.SettingsRoute) {
-            SettingsScreen(modifier = Modifier)
+            SettingsRoute(
+                settingsRepository = settingsRepository,
+                modifier = Modifier,
+            )
         }
     }
 }
