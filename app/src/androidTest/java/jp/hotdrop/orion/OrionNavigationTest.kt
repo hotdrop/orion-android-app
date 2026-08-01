@@ -21,7 +21,7 @@ class OrionNavigationTest {
         composeRule
             .onNodeWithContentDescription("現在の画面: INCOMING INTELLIGENCE")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("未実装").assertIsDisplayed()
+        composeRule.onNodeWithText("DRIVE TARGET // NOT CONFIGURED").assertIsDisplayed()
 
         composeRule
             .onNodeWithContentDescription("KNOWLEDGE ARCHIVEを開く")

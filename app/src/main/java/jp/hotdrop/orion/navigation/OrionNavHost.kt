@@ -13,6 +13,7 @@ import jp.hotdrop.orion.data.settings.SettingsRepository
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveEditorRoute
 import jp.hotdrop.orion.ui.archive.KnowledgeArchiveRoute
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceScreen
+import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceUiState
 import jp.hotdrop.orion.ui.settings.SettingsRoute
 
 @Composable
@@ -29,7 +30,17 @@ fun OrionNavHost(
         modifier = modifier,
     ) {
         composable(OrionTopLevelDestination.Incoming.route) {
-            IncomingIntelligenceScreen(modifier = Modifier)
+            IncomingIntelligenceScreen(
+                uiState = IncomingIntelligenceUiState(),
+                onSync = {},
+                onOpenSettings = {
+                    navController.navigate(OrionDestination.SettingsRoute) {
+                        launchSingleTop = true
+                    }
+                },
+                onOpenDocument = {},
+                modifier = Modifier,
+            )
         }
         composable(OrionTopLevelDestination.Archive.route) {
             KnowledgeArchiveRoute(

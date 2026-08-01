@@ -94,7 +94,7 @@ ORIONの機能は次の2つです。
 
 - 共通ヘッダー、下部ナビゲーション、Navigation ComposeによるSettingsを含む画面遷移を実装済みです。
 - 通常起動時はIncoming Intelligenceを選択し、画面を再生成しても選択中のタブを維持します。
-- Incoming Intelligenceの機能本体は未実装で、画面には「未実装」と表示します。
+- Incoming Intelligenceでは、Drive未設定、一覧、対象なし、同期中、オフライン、同期エラーの画面表現を実装済みです。Google Drive認証、定期同期、Roomキャッシュとの接続は未実装です。
 - Knowledge Archiveでは、Roomを使用した一覧、追加、編集、削除と外部アプリでのURL表示を実装済みです。
 - Knowledge Archiveの追加・編集画面では下部ナビゲーションを隠し、共通ヘッダーのRETURN操作とシステムの戻る操作で同じ破棄確認を行います。
 - SettingsではGoogle Driveフォルダパスの編集とRoomへの保存を実装済みです。その他の設定項目は未実装です。
