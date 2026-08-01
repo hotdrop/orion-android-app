@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import jp.hotdrop.orion.model.GoogleDriveTarget
+import jp.hotdrop.orion.ui.settings.components.ClearDriveFolderButtonTag
+import jp.hotdrop.orion.ui.settings.components.SelectDriveFolderButtonTag
 import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
 import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
 import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState

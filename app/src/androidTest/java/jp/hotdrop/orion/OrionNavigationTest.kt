@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import jp.hotdrop.orion.ui.settings.SelectDriveFolderButtonTag
+import jp.hotdrop.orion.ui.settings.components.SelectDriveFolderButtonTag
 import jp.hotdrop.orion.ui.archive.components.editor.ArchiveTitleInputTag
 import org.junit.Rule
 import org.junit.Test
