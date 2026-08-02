@@ -1,22 +1,17 @@
 package jp.hotdrop.orion.ui.incoming
 
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.google.android.gms.auth.api.identity.AuthorizationResult
-import jp.hotdrop.orion.data.remote.GoogleDriveAuthorizationClient
 import androidx.core.net.toUri
+import jp.hotdrop.orion.ui.drive.GoogleDriveAuthorizationResult
+import jp.hotdrop.orion.ui.drive.rememberGoogleDriveAuthorization
 
 @Composable
 fun IncomingIntelligenceRoute(
@@ -26,49 +21,19 @@ fun IncomingIntelligenceRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val authorizationClient = remember(context) { GoogleDriveAuthorizationClient(context) }
-
-    fun acceptAuthorizationResult(result: AuthorizationResult) {
-        val accessToken = result.accessToken
-        if (accessToken == null) {
-            viewModel.reportAuthorizationFailure()
-        } else {
-            viewModel.synchronize(accessToken)
+    val authorizeDrive = rememberGoogleDriveAuthorization { result ->
+        when (result) {
+            is GoogleDriveAuthorizationResult.Authorized -> viewModel.synchronize(result.accessToken)
+            GoogleDriveAuthorizationResult.Cancelled -> viewModel.reportAuthorizationFailure()
+            is GoogleDriveAuthorizationResult.Failed -> viewModel.reportAuthorizationFailure()
         }
-    }
-
-    val authorizationLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult(),
-    ) { activityResult ->
-        if (activityResult.resultCode != Activity.RESULT_OK) {
-            viewModel.reportAuthorizationFailure()
-            return@rememberLauncherForActivityResult
-        }
-        runCatching { authorizationClient.resultFromIntent(activityResult.data) }
-            .onSuccess(::acceptAuthorizationResult)
-            .onFailure { viewModel.reportAuthorizationFailure() }
     }
 
     IncomingIntelligenceScreen(
         uiState = uiState,
         onSync = {
             if (viewModel.beginSynchronization()) {
-                authorizationClient.authorizeAccess()
-                    .addOnSuccessListener { result ->
-                        if (result.hasResolution()) {
-                            val pendingIntent = result.pendingIntent
-                            if (pendingIntent == null) {
-                                viewModel.reportAuthorizationFailure()
-                            } else {
-                                authorizationLauncher.launch(
-                                    IntentSenderRequest.Builder(pendingIntent.intentSender).build(),
-                                )
-                            }
-                        } else {
-                            acceptAuthorizationResult(result)
-                        }
-                    }
-                    .addOnFailureListener { viewModel.reportAuthorizationFailure() }
+                authorizeDrive()
             }
         },
         onOpenSettings = onOpenSettings,

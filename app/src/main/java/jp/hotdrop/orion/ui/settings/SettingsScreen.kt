@@ -13,8 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.hotdrop.orion.model.GoogleDriveTarget
 import jp.hotdrop.orion.ui.settings.components.SettingsDriveTargetPanel
+import jp.hotdrop.orion.ui.settings.components.DriveFolderBrowserDialog
 import jp.hotdrop.orion.ui.settings.components.SettingsHeader
 import jp.hotdrop.orion.ui.settings.components.SettingsStatusPanel
+import jp.hotdrop.orion.ui.settings.uistate.DriveFolderItem
 import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
 import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
 import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
@@ -26,6 +28,10 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     onSelectFolder: () -> Unit,
     onClearFolder: () -> Unit,
+    onOpenFolder: (DriveFolderItem) -> Unit = {},
+    onNavigateToParentFolder: () -> Unit = {},
+    onConfirmFolder: () -> Unit = {},
+    onCancelFolderSelection: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val status = uiState.toStatusPresentation()
@@ -54,6 +60,17 @@ fun SettingsScreen(
             tone = status.tone,
         )
     }
+
+    uiState.folderBrowser?.let { browserState ->
+        DriveFolderBrowserDialog(
+            state = browserState,
+            isSaving = uiState.operation == SettingsOperation.SavingFolder,
+            onOpenFolder = onOpenFolder,
+            onNavigateUp = onNavigateToParentFolder,
+            onConfirm = onConfirmFolder,
+            onCancel = onCancelFolderSelection,
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -64,6 +81,10 @@ private fun SettingsScreenLoadingPreview() {
             uiState = SettingsUiState(),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }
@@ -76,6 +97,10 @@ private fun SettingsScreenIdlePreview() {
             uiState = SettingsUiState(operation = SettingsOperation.Idle),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }
@@ -85,9 +110,13 @@ private fun SettingsScreenIdlePreview() {
 private fun SettingsScreenSelectingFolderPreview() {
     OrionTheme {
         SettingsScreen(
-            uiState = SettingsUiState(operation = SettingsOperation.SelectingFolder),
+            uiState = SettingsUiState(operation = SettingsOperation.AuthorizingDrive),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }
@@ -107,6 +136,10 @@ private fun SettingsScreenFolderSavedPreview() {
             ),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }
@@ -122,6 +155,10 @@ private fun SettingsScreenClearedPreview() {
             ),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }
@@ -141,6 +178,10 @@ private fun SettingsScreenClearFailedPreview() {
             ),
             onSelectFolder = {},
             onClearFolder = {},
+            onOpenFolder = {},
+            onNavigateToParentFolder = {},
+            onConfirmFolder = {},
+            onCancelFolderSelection = {},
         )
     }
 }

@@ -47,7 +47,7 @@ fun IncomingIntelligenceDocumentCard(
             .border(1.dp, signalColor.copy(alpha = 0.8f), IncomingDocumentCardShape)
             .background(OrionPanelElevated.copy(alpha = 0.55f), IncomingDocumentCardShape)
             .clickable(role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = "${title}をGoogleドキュメントで開く" }
+            .semantics { contentDescription = "${title}を文書アプリで開く" }
             .padding(16.dp),
     ) {
         Row(

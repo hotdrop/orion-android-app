@@ -13,27 +13,8 @@ class GoogleDriveAuthorizationClient(context: Context) {
 
     fun authorizeAccess(): Task<AuthorizationResult> = client.authorize(
         AuthorizationRequest.builder()
-            .setRequestedScopes(listOf(DriveFileScope))
-            .build(),
-    )
-
-    fun selectFolder(): Task<AuthorizationResult> = client.authorize(
-        AuthorizationRequest.builder()
-            .setRequestedScopes(listOf(DriveFileScope))
+            .setRequestedScopes(listOf(DriveMetadataReadonlyScope))
             .setOptOutIncludingGrantedScopes(true)
-            .setPrompt(AuthorizationRequest.Prompt.CONSENT or AuthorizationRequest.Prompt.SELECT_ACCOUNT)
-            .addResourceParameter(
-                AuthorizationRequest.ResourceParameter.PICKER_OAUTH_TRIGGER,
-                "true",
-            )
-            .addResourceParameter(
-                AuthorizationRequest.ResourceParameter.PICKER_ALLOW_FOLDER_SELECTION,
-                "true",
-            )
-            .addResourceParameter(
-                AuthorizationRequest.ResourceParameter.PICKER_MIMETYPES,
-                GoogleDriveFolderMimeType,
-            )
             .build(),
     )
 
@@ -41,7 +22,7 @@ class GoogleDriveAuthorizationClient(context: Context) {
         client.getAuthorizationResultFromIntent(intent)
 
     companion object {
-        const val PICKED_FILE_IDS_PARAMETER = "picked_file_ids"
-        private val DriveFileScope = Scope("https://www.googleapis.com/auth/drive.file")
+        private val DriveMetadataReadonlyScope =
+            Scope("https://www.googleapis.com/auth/drive.metadata.readonly")
     }
 }

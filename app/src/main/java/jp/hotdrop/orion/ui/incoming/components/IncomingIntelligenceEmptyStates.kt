@@ -69,7 +69,7 @@ fun IncomingIntelligenceNoDocuments(
 ) {
     IncomingIntelligenceEmptyPanel(
         code = "NO SIGNALS DETECTED",
-        message = "対象フォルダにGoogleドキュメントがありません。",
+        message = "対象フォルダにGoogleドキュメントまたはWord文書がありません。",
         toneColor = OrionAmber,
         modifier = modifier,
     ) {

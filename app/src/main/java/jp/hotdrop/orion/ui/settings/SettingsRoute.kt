@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import jp.hotdrop.orion.ui.drive.GoogleDriveAuthorizationResult
+import jp.hotdrop.orion.ui.drive.rememberGoogleDriveAuthorization
 
 @Composable
 fun SettingsRoute(
@@ -12,15 +14,13 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectDriveFolder = rememberGoogleDriveFolderPicker { result ->
+    val authorizeDrive = rememberGoogleDriveAuthorization { result ->
         when (result) {
-            is GoogleDriveFolderPickerResult.Selected -> viewModel.saveSelectedFolder(
-                accessToken = result.accessToken,
-                folderId = result.folderId,
-            )
-
-            GoogleDriveFolderPickerResult.Cancelled -> viewModel.cancelFolderSelection()
-            is GoogleDriveFolderPickerResult.Failed -> {
+            is GoogleDriveAuthorizationResult.Authorized -> {
+                viewModel.openFolderBrowser(result.accessToken)
+            }
+            GoogleDriveAuthorizationResult.Cancelled -> viewModel.cancelFolderSelection()
+            is GoogleDriveAuthorizationResult.Failed -> {
                 viewModel.reportFolderSelectionFailure(result.cause)
             }
         }
@@ -30,10 +30,14 @@ fun SettingsRoute(
         uiState = uiState,
         onSelectFolder = {
             if (viewModel.beginFolderSelection()) {
-                selectDriveFolder()
+                authorizeDrive()
             }
         },
         onClearFolder = viewModel::clearDriveTarget,
+        onOpenFolder = viewModel::openFolder,
+        onNavigateToParentFolder = viewModel::navigateToParentFolder,
+        onConfirmFolder = viewModel::saveCurrentFolder,
+        onCancelFolderSelection = viewModel::cancelFolderSelection,
         modifier = modifier,
     )
 }

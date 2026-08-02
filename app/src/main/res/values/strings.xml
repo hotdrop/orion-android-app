@@ -20,7 +20,11 @@
     <string name="settings_status_loading_code">CONFIG DATA // LOADING</string>
     <string name="settings_status_loading_message">保存済み設定を読み込んでいます。</string>
     <string name="settings_status_selecting_code">DRIVE AUTH // ACTIVE</string>
-    <string name="settings_status_selecting_message">Google Driveのフォルダ選択を完了してください。</string>
+    <string name="settings_status_selecting_message">Google Driveのメタデータ参照を認可してください。</string>
+    <string name="settings_status_browsing_code">DRIVE DIRECTORY // BROWSING</string>
+    <string name="settings_status_browsing_message">同期対象のフォルダを選択しています。</string>
+    <string name="settings_status_saving_code">DRIVE TARGET // SAVING</string>
+    <string name="settings_status_saving_message">選択したフォルダを保存しています。</string>
     <string name="settings_status_clearing_code">DRIVE TARGET // CLEARING</string>
     <string name="settings_status_clearing_message">接続設定を解除しています。</string>
     <string name="settings_status_saved_code">DRIVE TARGET // CONNECTED</string>
@@ -37,4 +41,14 @@
     <string name="settings_status_not_configured_message">Google Driveフォルダは未設定です。</string>
     <string name="settings_status_ready_code">DRIVE TARGET // READY</string>
     <string name="settings_status_ready_message">自動通信は行いません。Incoming画面のSYNCで取得します。</string>
+
+    <string name="settings_folder_browser_title">DRIVE DIRECTORY // SELECT TARGET</string>
+    <string name="settings_folder_browser_path_label">CURRENT PATH</string>
+    <string name="settings_folder_browser_loading">フォルダ階層を読み込んでいます…</string>
+    <string name="settings_folder_browser_empty">サブフォルダはありません。このフォルダ自体は選択できます。</string>
+    <string name="settings_folder_browser_up">[ UP ]</string>
+    <string name="settings_folder_browser_cancel">[ CANCEL ]</string>
+    <string name="settings_folder_browser_confirm">[ SELECT THIS FOLDER ]</string>
+    <string name="settings_folder_browser_open_folder">%1$sフォルダを開く</string>
+    <string name="settings_folder_browser_current_folder">現在のフォルダ: %1$s</string>
 </resources>

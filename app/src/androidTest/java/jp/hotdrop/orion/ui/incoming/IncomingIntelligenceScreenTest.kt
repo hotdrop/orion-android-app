@@ -72,7 +72,7 @@ class IncomingIntelligenceScreenTest {
         composeRule.onNodeWithText("UPLINK // OFFLINE CACHE").assertIsDisplayed()
         composeRule.onNodeWithTag(IncomingSyncButtonTag).assertIsEnabled()
         composeRule
-            .onNodeWithContentDescription("Compose performance notesをGoogleドキュメントで開く")
+            .onNodeWithContentDescription("Compose performance notesを文書アプリで開く")
             .performClick()
         assertEquals("first", openedId)
     }

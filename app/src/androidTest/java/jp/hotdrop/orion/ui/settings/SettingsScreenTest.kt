@@ -11,6 +11,11 @@ import androidx.compose.ui.test.performClick
 import jp.hotdrop.orion.model.GoogleDriveTarget
 import jp.hotdrop.orion.ui.settings.components.ClearDriveFolderButtonTag
 import jp.hotdrop.orion.ui.settings.components.SelectDriveFolderButtonTag
+import jp.hotdrop.orion.ui.settings.components.ConfirmDriveFolderButtonTag
+import jp.hotdrop.orion.ui.settings.components.DriveFolderBrowserDialogTag
+import jp.hotdrop.orion.ui.settings.components.DriveFolderItemTagPrefix
+import jp.hotdrop.orion.ui.settings.uistate.DriveFolderBrowserUiState
+import jp.hotdrop.orion.ui.settings.uistate.DriveFolderItem
 import jp.hotdrop.orion.ui.settings.uistate.SettingsFeedback
 import jp.hotdrop.orion.ui.settings.uistate.SettingsOperation
 import jp.hotdrop.orion.ui.settings.uistate.SettingsUiState
@@ -85,7 +90,7 @@ class SettingsScreenTest {
             OrionTheme {
                 SettingsScreen(
                     uiState = SettingsUiState(
-                        operation = SettingsOperation.SelectingFolder,
+                        operation = SettingsOperation.AuthorizingDrive,
                     ),
                     onSelectFolder = {},
                     onClearFolder = {},
@@ -118,5 +123,37 @@ class SettingsScreenTest {
         composeRule.onNodeWithText(
             "Google Driveフォルダの設定を解除できませんでした。再試行してください。",
         ).assertIsDisplayed()
+    }
+
+    @Test
+    fun folderBrowser_opensFolderAndConfirmsCurrentFolder() {
+        var openedFolder: DriveFolderItem? = null
+        var confirmClicks = 0
+        val folder = DriveFolderItem("tech", "技術資料")
+        composeRule.setContent {
+            OrionTheme {
+                SettingsScreen(
+                    uiState = SettingsUiState(
+                        operation = SettingsOperation.BrowsingFolders,
+                        folderBrowser = DriveFolderBrowserUiState(
+                            currentFolderId = "root",
+                            currentPath = "My Drive",
+                            folders = listOf(folder),
+                            isLoading = false,
+                        ),
+                    ),
+                    onSelectFolder = {},
+                    onClearFolder = {},
+                    onOpenFolder = { openedFolder = it },
+                    onConfirmFolder = { confirmClicks++ },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(DriveFolderBrowserDialogTag).assertIsDisplayed()
+        composeRule.onNodeWithTag("$DriveFolderItemTagPrefix${folder.id}").performClick()
+        assertEquals(folder, openedFolder)
+        composeRule.onNodeWithTag(ConfirmDriveFolderButtonTag).assertIsEnabled().performClick()
+        assertEquals(1, confirmClicks)
     }
 }

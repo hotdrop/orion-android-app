@@ -12,6 +12,8 @@ import androidx.core.net.toUri
 
 internal const val GoogleDriveFolderMimeType = "application/vnd.google-apps.folder"
 internal const val GoogleDocumentMimeType = "application/vnd.google-apps.document"
+internal const val WordDocumentMimeType =
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 data class GoogleDriveFile(
     val id: String,
@@ -22,36 +24,52 @@ data class GoogleDriveFile(
 )
 
 interface GoogleDriveRemoteDataSource {
-    suspend fun getFolder(accessToken: String, folderId: String): GoogleDriveFile
     suspend fun listChildren(accessToken: String, folderId: String): List<GoogleDriveFile>
+    suspend fun listFolders(accessToken: String, parentFolderId: String): List<GoogleDriveFile>
 }
 
 class HttpGoogleDriveRemoteDataSource(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : GoogleDriveRemoteDataSource {
-    override suspend fun getFolder(accessToken: String, folderId: String): GoogleDriveFile =
-        withContext(ioDispatcher) {
-            val url = "https://www.googleapis.com/drive/v3/files/$folderId".toUri()
-                .buildUpon()
-                .appendQueryParameter("fields", DRIVE_FILE_FIELDS)
-                .build()
-                .toString()
-            parseFile(executeGet(url, accessToken))
-        }
-
     override suspend fun listChildren(
         accessToken: String,
         folderId: String,
+    ): List<GoogleDriveFile> = listFiles(
+        accessToken = accessToken,
+        parentFolderId = folderId,
+        mimeTypeQuery = "(" +
+            "mimeType = '$GoogleDriveFolderMimeType' or " +
+            "mimeType = '$GoogleDocumentMimeType' or " +
+            "mimeType = '$WordDocumentMimeType'" +
+            ")",
+        orderBy = "modifiedTime desc",
+    )
+
+    override suspend fun listFolders(
+        accessToken: String,
+        parentFolderId: String,
+    ): List<GoogleDriveFile> = listFiles(
+        accessToken = accessToken,
+        parentFolderId = parentFolderId,
+        mimeTypeQuery = "mimeType = '$GoogleDriveFolderMimeType'",
+        orderBy = "name",
+    )
+
+    private suspend fun listFiles(
+        accessToken: String,
+        parentFolderId: String,
+        mimeTypeQuery: String,
+        orderBy: String,
     ): List<GoogleDriveFile> = withContext(ioDispatcher) {
         val files = mutableListOf<GoogleDriveFile>()
         var pageToken: String? = null
         do {
-            val query = "'$folderId' in parents and trashed = false and " + "(mimeType = '$GoogleDriveFolderMimeType' or mimeType = '$GoogleDocumentMimeType')"
+            val query = "'$parentFolderId' in parents and trashed = false and $mimeTypeQuery"
             val uriBuilder = "https://www.googleapis.com/drive/v3/files".toUri()
                 .buildUpon()
                 .appendQueryParameter("q", query)
                 .appendQueryParameter("spaces", "drive")
-                .appendQueryParameter("orderBy", "modifiedTime desc")
+                .appendQueryParameter("orderBy", orderBy)
                 .appendQueryParameter("pageSize", "1000")
                 .appendQueryParameter("fields", "nextPageToken,files($DRIVE_FILE_FIELDS)")
             pageToken?.let { uriBuilder.appendQueryParameter("pageToken", it) }

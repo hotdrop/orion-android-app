@@ -7,6 +7,7 @@ import jp.hotdrop.orion.data.remote.GoogleDocumentMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveFile
 import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.remote.WordDocumentMimeType
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,6 +87,26 @@ class RoomIncomingIntelligenceRepositoryTest {
         assertTrue(saved.getValue("updated").isNew)
     }
 
+    @Test
+    fun synchronize_includesGoogleDocumentsAndWordDocuments() = runTest {
+        val dao = FakeIncomingDao()
+        val remote = FakeDriveRemoteDataSource(
+            children = mapOf(
+                "root" to listOf(
+                    document("google-doc", "Google Doc", 10),
+                    wordDocument("word-doc", "Report.docx", 20),
+                ),
+            ),
+        )
+        val repository = IncomingIntelligenceRepository(dao, remote)
+
+        repository.synchronize("root", "token")
+
+        val saved = dao.documents.value.associateBy { it.driveFileId }
+        assertEquals(setOf("google-doc", "word-doc"), saved.keys)
+        assertEquals("https://drive.google.com/file/d/word-doc/view", saved.getValue("word-doc").webUrl)
+    }
+
     private fun folder(id: String, name: String) = GoogleDriveFile(
         id = id,
         name = name,
@@ -100,6 +121,14 @@ class RoomIncomingIntelligenceRepositoryTest {
         mimeType = GoogleDocumentMimeType,
         modifiedAt = modifiedAt,
         webViewLink = "https://docs.google.com/document/d/$id/edit",
+    )
+
+    private fun wordDocument(id: String, name: String, modifiedAt: Long) = GoogleDriveFile(
+        id = id,
+        name = name,
+        mimeType = WordDocumentMimeType,
+        modifiedAt = modifiedAt,
+        webViewLink = "https://drive.google.com/file/d/$id/view",
     )
 
     private fun entity(id: String, modifiedAt: Long, isNew: Boolean) = IncomingIntelligenceEntity(
@@ -119,14 +148,17 @@ private class FakeDriveRemoteDataSource(
 ) : GoogleDriveRemoteDataSource {
     val requestedFolderIds = mutableListOf<String>()
 
-    override suspend fun getFolder(accessToken: String, folderId: String) =
-        error("Not used")
-
     override suspend fun listChildren(accessToken: String, folderId: String): List<GoogleDriveFile> {
         requestedFolderIds += folderId
         if (folderId == failingFolderId) throw IOException("request failed")
         return children[folderId].orEmpty()
     }
+
+    override suspend fun listFolders(
+        accessToken: String,
+        parentFolderId: String,
+    ): List<GoogleDriveFile> = children[parentFolderId].orEmpty()
+        .filter { it.mimeType == GoogleDriveFolderMimeType }
 }
 
 private class FakeIncomingDao(initialDocuments: List<IncomingIntelligenceEntity> = emptyList()) :

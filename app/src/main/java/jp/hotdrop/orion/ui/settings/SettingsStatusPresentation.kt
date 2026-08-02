@@ -27,9 +27,21 @@ internal fun SettingsUiState.toStatusPresentation(): SettingsStatusPresentation 
         tone = SettingsStatusTone.Normal,
     )
 
-    operation == SettingsOperation.SelectingFolder -> SettingsStatusPresentation(
+    operation == SettingsOperation.AuthorizingDrive -> SettingsStatusPresentation(
         codeRes = R.string.settings_status_selecting_code,
         messageRes = R.string.settings_status_selecting_message,
+        tone = SettingsStatusTone.Normal,
+    )
+
+    operation == SettingsOperation.BrowsingFolders -> SettingsStatusPresentation(
+        codeRes = R.string.settings_status_browsing_code,
+        messageRes = R.string.settings_status_browsing_message,
+        tone = SettingsStatusTone.Normal,
+    )
+
+    operation == SettingsOperation.SavingFolder -> SettingsStatusPresentation(
+        codeRes = R.string.settings_status_saving_code,
+        messageRes = R.string.settings_status_saving_message,
         tone = SettingsStatusTone.Normal,
     )
 

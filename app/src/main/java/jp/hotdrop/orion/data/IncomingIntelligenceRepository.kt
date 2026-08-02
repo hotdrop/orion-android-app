@@ -4,6 +4,7 @@ import jp.hotdrop.orion.data.remote.GoogleDocumentMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveFile
 import jp.hotdrop.orion.data.remote.GoogleDriveFolderMimeType
 import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
+import jp.hotdrop.orion.data.remote.WordDocumentMimeType
 import jp.hotdrop.orion.data.local.dao.IncomingIntelligenceDao
 import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceEntity
 import jp.hotdrop.orion.data.local.entity.IncomingIntelligenceRecord
@@ -40,7 +41,7 @@ class IncomingIntelligenceRepository @Inject constructor(
                 title = document.file.name,
                 modifiedAt = document.file.modifiedAt,
                 relativePath = document.relativePath,
-                webUrl = document.file.webViewLink ?: "https://docs.google.com/document/d/${document.file.id}/edit",
+                webUrl = document.file.webViewLink ?: "https://drive.google.com/open?id=${document.file.id}",
                 isNew = cached == null || cached.isNew || cached.modifiedAt < document.file.modifiedAt,
             )
         }
@@ -70,7 +71,9 @@ class IncomingIntelligenceRepository @Inject constructor(
                         id = file.id,
                         relativePath = joinPath(folder.relativePath, file.name),
                     )
-                    GoogleDocumentMimeType -> documents += RemoteDocument(
+                    GoogleDocumentMimeType,
+                    WordDocumentMimeType,
+                    -> documents += RemoteDocument(
                         file = file,
                         relativePath = folder.relativePath.ifEmpty { "/" },
                     )
