@@ -31,13 +31,15 @@ ORIONは起動時とバックグラウンドからの復帰時にロックし、
 
 ## Incoming Intelligence 
 - 今週収集した技術情報を管理します。
-- Google Drive上のGoogleドキュメントのタイトル
+- Google Drive上のGoogleドキュメントまたはWord文書（`.docx`）のタイトル
 - Google Drive上の最終更新日時
 - 設定したフォルダからの相対パス
 
-Google Driveの指定したフォルダを設定画面で選択し、画面上の手動更新を実行したときだけ、タイトル、最終更新日時、相対パスを取得します。アプリ起動時やバックグラウンドでは自動取得しません。
+Google Driveの指定したフォルダを設定画面で選択し、画面上の手動更新を実行したときだけ、GoogleドキュメントとWord文書（`.docx`）のタイトル、最終更新日時、相対パスを取得します。アプリ起動時やバックグラウンドでは自動取得しません。
 取得結果は端末内へ保存し、オフラインや取得失敗時も最後に取得できた一覧を表示します。
-一覧の項目をタップすると、対象のGoogleドキュメントをGoogleドキュメントアプリまたはブラウザで開きます。ORION内ではドキュメント本文を表示しません。
+一覧の項目をタップすると、対象文書を対応アプリまたはブラウザで開きます。ORION内では文書本文を表示しません。
+
+Google Drive連携を利用するには、ローカル実行であってもGoogle Cloudプロジェクトの作成、Google Drive APIの有効化、OAuth同意画面とAndroid OAuthクライアントの設定が必要です。Firebaseへのアプリ登録や`google-services.json`は使用しません。ORIONは本文を取得せず、`drive.metadata.readonly`スコープでDrive全体のメタデータを参照し、選択フォルダ配下を走査します。
 
 開発環境からGoogle Driveへ接続するための設定は [`docs/GoogleDriveSetup.md`](docs/GoogleDriveSetup.md) を参照してください。
 

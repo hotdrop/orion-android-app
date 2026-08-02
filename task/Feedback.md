@@ -80,3 +80,18 @@
 ## 分類と反映先候補
 - 分類: 恒久対応候補
 - 反映先候補: `.skills/android-app-architecture/SKILL.md`、Navigation設計、DI導入判断基準
+
+# 2026/8/2 09:55 フィードバック
+
+## 作業内容
+- Google Pickerと`drive.file`によるフォルダ選択を廃止し、`drive.metadata.readonly`とORION内のフォルダ選択画面へ移行した。
+- Googleドキュメントに加えてWord文書（`.docx`）のメタデータ同期へ対応した。
+
+## 再利用可能な改善点
+- 障壁または不足: Google Pickerでフォルダを選択しても、`drive.file`が許可するのはPickerで個別共有されたファイルであり、フォルダ配下のファイルを再帰走査する設計とは一致しない。フォルダ選択UI上も、フォルダへの移動とフォルダ自体の確定を完了できない組み合わせが生じる。
+- 改善案: Drive連携の設計時に、個別ファイル選択かフォルダ配下の列挙かを先に確定し、必要な情報がメタデータだけなら`drive.metadata.readonly`とDrive APIベースのアプリ内フォルダ選択を採用する。`drive.file`をフォルダ単位の権限として扱わない。
+- 根拠: `PICKER_ALLOW_FOLDER_SELECTION`とフォルダMIMEフィルタでは端末上で対象フォルダ内へ移動するだけになり、確定操作を提示できなかった。また、Google Drive APIの公式スコープ定義では`drive.file`はアプリで開いた、またはPickerで共有した個別ファイルを対象としている。
+
+## 分類と反映先候補
+- 分類: 恒久対応候補
+- 反映先候補: `.skills/android-app-architecture/SKILL.md`、`docs/GoogleDriveSetup.md`、Google Drive連携テスト
