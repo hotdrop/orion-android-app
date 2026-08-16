@@ -7,13 +7,13 @@ import org.junit.Test
 
 class AuthenticationViewModelTest {
     @Test
-    fun authentication_startsOnlyInForeground() {
+    fun authentication_startsOnlyAfterAppLaunch() {
         val viewModel = AuthenticationViewModel()
 
         assertEquals(AuthenticationUiState.Locked, viewModel.uiState.value)
         assertFalse(viewModel.requestAuthentication())
 
-        viewModel.onForeground()
+        viewModel.onAppLaunched()
 
         assertEquals(AuthenticationUiState.Booting, viewModel.uiState.value)
         assertTrue(viewModel.requestAuthentication())
@@ -23,7 +23,7 @@ class AuthenticationViewModelTest {
 
     @Test
     fun successfulAuthentication_unlocksAfterAnimation() {
-        val viewModel = foregroundViewModel()
+        val viewModel = launchedViewModel()
 
         viewModel.requestAuthentication()
         viewModel.onAuthenticationResult(BiometricAuthenticationResult.Success)
@@ -37,7 +37,7 @@ class AuthenticationViewModelTest {
 
     @Test
     fun failedAttempt_keepsSystemAuthenticationActive() {
-        val viewModel = foregroundViewModel()
+        val viewModel = launchedViewModel()
         viewModel.requestAuthentication()
 
         viewModel.onAuthenticationResult(BiometricAuthenticationResult.AttemptFailed)
@@ -51,7 +51,7 @@ class AuthenticationViewModelTest {
 
     @Test
     fun canceledAuthentication_canBeRetried() {
-        val viewModel = foregroundViewModel()
+        val viewModel = launchedViewModel()
         viewModel.requestAuthentication()
 
         viewModel.onAuthenticationResult(
@@ -71,7 +71,7 @@ class AuthenticationViewModelTest {
 
     @Test
     fun missingDeviceSecurity_offersSystemSettings() {
-        val viewModel = foregroundViewModel()
+        val viewModel = launchedViewModel()
         viewModel.requestAuthentication()
 
         viewModel.onAuthenticationResult(BiometricAuthenticationResult.DeviceSecurityRequired)
@@ -81,29 +81,32 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun backgroundingUnlockedApp_relocksIt() {
-        val viewModel = foregroundViewModel()
+    fun repeatedLaunchEvent_keepsAuthenticatedSessionUnlocked() {
+        val viewModel = launchedViewModel()
         viewModel.requestAuthentication()
         viewModel.onAuthenticationResult(BiometricAuthenticationResult.Success)
         viewModel.completeUnlockAnimation()
 
-        viewModel.onBackground()
+        viewModel.onAppLaunched()
 
-        assertEquals(AuthenticationUiState.Locked, viewModel.uiState.value)
+        assertEquals(AuthenticationUiState.Unlocked, viewModel.uiState.value)
+        assertFalse(viewModel.requestAuthentication())
     }
 
     @Test
-    fun authenticationSuccessWhileBackgrounded_doesNotUnlock() {
-        val viewModel = foregroundViewModel()
-        viewModel.requestAuthentication()
-        viewModel.onBackground()
+    fun newSession_requiresAuthenticationAgain() {
+        val previousSession = launchedViewModel()
+        previousSession.requestAuthentication()
+        previousSession.onAuthenticationResult(BiometricAuthenticationResult.Success)
+        previousSession.completeUnlockAnimation()
 
-        viewModel.onAuthenticationResult(BiometricAuthenticationResult.Success)
+        val newSession = launchedViewModel()
 
-        assertEquals(AuthenticationUiState.Locked, viewModel.uiState.value)
+        assertEquals(AuthenticationUiState.Booting, newSession.uiState.value)
+        assertTrue(newSession.requestAuthentication())
     }
 
-    private fun foregroundViewModel() = AuthenticationViewModel().also {
-        it.onForeground()
+    private fun launchedViewModel() = AuthenticationViewModel().also {
+        it.onAppLaunched()
     }
 }

@@ -12,24 +12,14 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
     private val mutableUiState = MutableStateFlow<AuthenticationUiState>(AuthenticationUiState.Locked)
     val uiState: StateFlow<AuthenticationUiState> = mutableUiState.asStateFlow()
 
-    private var isForeground = false
-
-    fun onForeground() {
-        isForeground = true
+    fun onAppLaunched() {
         if (mutableUiState.value == AuthenticationUiState.Locked) {
             mutableUiState.value = AuthenticationUiState.Booting
         }
     }
 
-    fun onBackground() {
-        isForeground = false
-        if (mutableUiState.value !is AuthenticationUiState.Authenticating) {
-            mutableUiState.value = AuthenticationUiState.Locked
-        }
-    }
-
     fun requestAuthentication(): Boolean {
-        val canRequest = isForeground && when (mutableUiState.value) {
+        val canRequest = when (mutableUiState.value) {
             AuthenticationUiState.Booting,
             is AuthenticationUiState.Error,
             -> true
@@ -43,11 +33,6 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onAuthenticationResult(result: BiometricAuthenticationResult) {
-        if (!isForeground) {
-            mutableUiState.value = AuthenticationUiState.Locked
-            return
-        }
-
         mutableUiState.value = when (result) {
             BiometricAuthenticationResult.Success -> AuthenticationUiState.AccessGranted
             BiometricAuthenticationResult.AttemptFailed -> {
@@ -78,7 +63,7 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
     }
 
     fun completeUnlockAnimation() {
-        if (mutableUiState.value == AuthenticationUiState.AccessGranted && isForeground) {
+        if (mutableUiState.value == AuthenticationUiState.AccessGranted) {
             mutableUiState.value = AuthenticationUiState.Unlocked
         }
     }

@@ -30,6 +30,7 @@ class MainActivity : FragmentActivity() {
             activity = this,
             onResult = authenticationViewModel::onAuthenticationResult,
         )
+        authenticationViewModel.onAppLaunched()
 
         setContent {
             val authenticationUiState by authenticationViewModel.uiState.collectAsStateWithLifecycle()
@@ -52,17 +53,5 @@ class MainActivity : FragmentActivity() {
                 }
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        authenticationViewModel.onForeground()
-    }
-
-    override fun onStop() {
-        if (!isChangingConfigurations) {
-            authenticationViewModel.onBackground()
-        }
-        super.onStop()
     }
 }
