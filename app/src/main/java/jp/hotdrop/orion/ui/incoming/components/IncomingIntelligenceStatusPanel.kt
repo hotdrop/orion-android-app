@@ -32,7 +32,6 @@ internal fun IncomingIntelligenceStatusPanel(
     code: String,
     description: String,
     tone: IncomingIntelligenceStatusTone,
-    lastSyncedAtLabel: String?,
     modifier: Modifier = Modifier,
 ) {
     val statusColor = tone.toColor()
@@ -61,14 +60,6 @@ internal fun IncomingIntelligenceStatusPanel(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-        lastSyncedAtLabel?.let { label ->
-            Text(
-                text = "LAST // $label",
-                color = OrionTextMuted,
-                fontSize = 9.sp,
-                letterSpacing = 0.8.sp,
-            )
-        }
     }
 }
 
@@ -80,13 +71,12 @@ private fun IncomingIntelligenceStatusTone.toColor(): Color = when (this) {
 
 @Preview
 @Composable
-private fun IncomingIntelligenceStatusPanelReadyPreview() {
+private fun IncomingIntelligenceStatusPanelReceivingPreview() {
     OrionTheme {
         IncomingIntelligenceStatusPanel(
-            code = "UPLINK // READY",
-            description = "Google Drive同期チャネルは待機中です。",
+            code = "UPLINK // RECEIVING",
+            description = "同期中です。保存済みの信号は引き続き参照できます。",
             tone = IncomingIntelligenceStatusTone.Normal,
-            lastSyncedAtLabel = "08/01 09:45",
         )
     }
 }
@@ -99,7 +89,6 @@ private fun IncomingIntelligenceStatusPanelErrorPreview() {
             code = "UPLINK // ERROR",
             description = "認証を確認してから再試行してください。",
             tone = IncomingIntelligenceStatusTone.Error,
-            lastSyncedAtLabel = "07/31 23:10",
         )
     }
 }

@@ -16,7 +16,7 @@ internal enum class IncomingIntelligenceStatusTone {
     Error,
 }
 
-internal fun IncomingIntelligenceUiState.toStatusPresentation(): IncomingIntelligenceStatusPresentation = when {
+internal fun IncomingIntelligenceUiState.toStatusPresentation(): IncomingIntelligenceStatusPresentation? = when {
     !isDriveConfigured -> IncomingIntelligenceStatusPresentation(
         code = "UPLINK // STANDBY",
         description = "同期先が未設定です。",
@@ -41,9 +41,5 @@ internal fun IncomingIntelligenceUiState.toStatusPresentation(): IncomingIntelli
         tone = IncomingIntelligenceStatusTone.Warning,
     )
 
-    else -> IncomingIntelligenceStatusPresentation(
-        code = "UPLINK // READY",
-        description = "Google Drive同期チャネルは待機中です。",
-        tone = IncomingIntelligenceStatusTone.Normal,
-    )
+    else -> null
 }

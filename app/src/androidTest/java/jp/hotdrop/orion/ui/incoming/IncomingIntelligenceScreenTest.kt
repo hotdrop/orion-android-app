@@ -1,8 +1,11 @@
 package jp.hotdrop.orion.ui.incoming
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -75,5 +78,48 @@ class IncomingIntelligenceScreenTest {
             .onNodeWithContentDescription("Compose performance notesを文書アプリで開く")
             .performClick()
         assertEquals("first", openedId)
+    }
+
+    @Test
+    fun ready_hidesPersistentStatusAndSyncsFromReactor() {
+        var syncClicks = 0
+        composeRule.setContent {
+            OrionTheme {
+                IncomingIntelligenceScreen(
+                    uiState = IncomingIntelligenceUiState(
+                        isDriveConfigured = true,
+                        lastSyncedAtLabel = "08/01 09:45",
+                    ),
+                    onSync = { syncClicks++ },
+                    onOpenSettings = {},
+                    onOpenDocument = {},
+                )
+            }
+        }
+
+        composeRule.onAllNodesWithText("UPLINK // READY").assertCountEquals(0)
+        composeRule.onNodeWithText("LAST // 08/01 09:45").assertIsDisplayed()
+        composeRule.onNodeWithTag(IncomingSyncButtonTag).performClick()
+        assertEquals(1, syncClicks)
+    }
+
+    @Test
+    fun syncing_disablesSyncReactor() {
+        composeRule.setContent {
+            OrionTheme {
+                IncomingIntelligenceScreen(
+                    uiState = IncomingIntelligenceUiState(
+                        isDriveConfigured = true,
+                        isSyncing = true,
+                    ),
+                    onSync = {},
+                    onOpenSettings = {},
+                    onOpenDocument = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("UPLINK // RECEIVING").assertIsDisplayed()
+        composeRule.onNodeWithTag(IncomingSyncButtonTag).assertIsNotEnabled()
     }
 }

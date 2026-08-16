@@ -2,6 +2,7 @@ package jp.hotdrop.orion.ui.incoming
 
 import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceUiState
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class IncomingIntelligenceStatusPresentationTest {
@@ -13,8 +14,8 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "error",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // STANDBY", status.code)
-        assertEquals(IncomingIntelligenceStatusTone.Warning, status.tone)
+        assertEquals("UPLINK // STANDBY", status?.code)
+        assertEquals(IncomingIntelligenceStatusTone.Warning, status?.tone)
     }
 
     @Test
@@ -26,8 +27,8 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "error",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // RECEIVING", status.code)
-        assertEquals(IncomingIntelligenceStatusTone.Normal, status.tone)
+        assertEquals("UPLINK // RECEIVING", status?.code)
+        assertEquals(IncomingIntelligenceStatusTone.Normal, status?.tone)
     }
 
     @Test
@@ -38,9 +39,9 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "認証エラー",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // ERROR", status.code)
-        assertEquals("認証エラー", status.description)
-        assertEquals(IncomingIntelligenceStatusTone.Error, status.tone)
+        assertEquals("UPLINK // ERROR", status?.code)
+        assertEquals("認証エラー", status?.description)
+        assertEquals(IncomingIntelligenceStatusTone.Error, status?.tone)
     }
 
     @Test
@@ -50,17 +51,16 @@ class IncomingIntelligenceStatusPresentationTest {
             isOffline = true,
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // OFFLINE CACHE", status.code)
-        assertEquals(IncomingIntelligenceStatusTone.Warning, status.tone)
+        assertEquals("UPLINK // OFFLINE CACHE", status?.code)
+        assertEquals(IncomingIntelligenceStatusTone.Warning, status?.tone)
     }
 
     @Test
-    fun connectedIdle_isReady() {
+    fun connectedIdle_hasNoPersistentStatus() {
         val status = IncomingIntelligenceUiState(
             isDriveConfigured = true,
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // READY", status.code)
-        assertEquals(IncomingIntelligenceStatusTone.Normal, status.tone)
+        assertNull(status)
     }
 }

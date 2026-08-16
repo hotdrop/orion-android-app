@@ -40,19 +40,21 @@ fun IncomingIntelligenceScreen(
         IncomingIntelligenceHeader(
             documentCount = uiState.documents.size,
             newDocumentCount = uiState.documents.count(IncomingIntelligenceDocument::isNew),
+            lastSyncedAtLabel = uiState.lastSyncedAtLabel,
             isSyncing = uiState.isSyncing,
             syncEnabled = uiState.isDriveConfigured && !uiState.isSyncing,
             onSync = onSync,
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        IncomingIntelligenceStatusPanel(
-            code = status.code,
-            description = status.description,
-            tone = status.tone,
-            lastSyncedAtLabel = uiState.lastSyncedAtLabel,
-        )
-        Spacer(modifier = Modifier.height(12.dp))
+        status?.let { presentation ->
+            IncomingIntelligenceStatusPanel(
+                code = presentation.code,
+                description = presentation.description,
+                tone = presentation.tone,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         when {
             !uiState.isDriveConfigured -> IncomingIntelligenceDriveNotConfigured(
