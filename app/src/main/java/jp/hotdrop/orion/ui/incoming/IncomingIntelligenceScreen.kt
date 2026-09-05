@@ -66,8 +66,6 @@ fun IncomingIntelligenceScreen(
             .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         IncomingIntelligenceHeader(
-            documentCount = uiState.documents.size,
-            newDocumentCount = uiState.documents.count(IncomingIntelligenceDocument::isNew),
             lastSyncedAtLabel = uiState.lastSyncedAtLabel,
             isSyncing = uiState.isSyncing,
             syncEnabled = uiState.isDriveConfigured && !uiState.isSyncing,
@@ -91,8 +89,8 @@ fun IncomingIntelligenceScreen(
         }
 
         FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FilterChip(selected = !uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(false) }, label = { Text("ALL / すべて") })
-            FilterChip(selected = uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(true) }, label = { Text("★ / お気に入り") })
+            FilterChip(selected = !uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(false) }, label = { Text("ALL") })
+            FilterChip(selected = uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(true) }, label = { Text("FAVORITE") })
         }
         Spacer(modifier = Modifier.height(8.dp))
         when {

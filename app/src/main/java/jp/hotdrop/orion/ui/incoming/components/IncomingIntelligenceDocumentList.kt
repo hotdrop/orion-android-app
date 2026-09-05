@@ -48,23 +48,3 @@ fun IncomingIntelligenceDocumentList(
         }
     }
 }
-
-@Preview
-@Composable
-private fun IncomingIntelligenceDocumentListPreview() {
-    OrionTheme {
-        IncomingIntelligenceDocumentList(
-            documents = listOf(
-                IncomingIntelligenceDocument(
-                    id = "compose-performance",
-                    title = "Jetpack Composeの描画パフォーマンスを安定させるための実践ガイド",
-                    updatedAtLabel = "08/01 09:42",
-                    relativePath = "Android/Compose/Weekly",
-                    webUrl = "https://docs.google.com/document/d/compose-performance",
-                    isNew = true,
-                ),
-            ),
-            onOpenDocument = {},
-        )
-    }
-}

@@ -1,5 +1,6 @@
 package jp.hotdrop.orion.ui.incoming
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.hotdrop.orion.ui.theme.OrionCyan
+import jp.hotdrop.orion.ui.theme.OrionDeepNavy
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
@@ -34,7 +36,12 @@ fun IncomingMemoScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(20.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding()
+            .background(OrionDeepNavy)
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text("PERSONAL NOTE", color = OrionCyan, style = MaterialTheme.typography.labelLarge)
@@ -45,7 +52,7 @@ fun IncomingMemoScreen(
             if (state.canSave) {
                 OutlinedTextField(
                     value = state.memo, onValueChange = onMemoChanged,
-                    label = { Text("概要メモ") }, minLines = 6,
+                    label = { Text("概要メモ") }, minLines = 18,
                     enabled = !state.isSaving, modifier = Modifier.fillMaxWidth(),
                     shape = CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -74,7 +81,6 @@ fun IncomingMemoScreen(
 }
 
 @Preview(showBackground = true)
-@Preview(showBackground = true, fontScale = 1.6f)
 @Composable
 private fun IncomingMemoPreview() {
     OrionTheme {

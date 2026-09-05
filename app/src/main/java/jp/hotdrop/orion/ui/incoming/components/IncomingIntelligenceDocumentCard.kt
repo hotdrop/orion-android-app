@@ -62,17 +62,17 @@ fun IncomingIntelligenceDocumentCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (isNew) "NEW SIGNAL // UNREAD" else "ARCHIVED SIGNAL // READ",
+                text = if (isNew) "NEW SIGNAL" else "READ SIGNAL",
                 modifier = Modifier.weight(1f),
                 color = signalColor,
-                fontSize = 9.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.1.sp,
             )
             Text(
                 text = updatedAtLabel,
                 color = OrionTextMuted,
-                fontSize = 9.sp,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -80,8 +80,7 @@ fun IncomingIntelligenceDocumentCard(
             text = title,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                .clickable(role = Role.Button, onClick = onClick)
-                .semantics { contentDescription = "${title}を文書アプリで開く" },
+                .clickable(role = Role.Button, onClick = onClick),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             maxLines = 2,

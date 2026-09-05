@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -220,25 +221,22 @@ private fun SecurityHeader() {
     ) {
         Column {
             Text(
-                text = "O R I O N",
+                text = "ORION",
                 color = OrionCyan,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 4.sp,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
             )
             Text(
-                text = "SECURE ACCESS NODE // 01",
+                text = "SECURE ACCESS NODE 01",
                 color = OrionTextMuted,
-                fontSize = 9.sp,
-                letterSpacing = 1.3.sp,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
         Text(
-            text = "[ LOCKED ]",
+            text = "[LOCKED]",
             color = OrionAmber,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.2.sp,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -374,7 +372,7 @@ private fun SecurityStatus(
             detail = if (uiState.failedAttempts == 0) {
                 "AWAITING AUTHORIZATION SIGNAL"
             } else {
-                "SIGNAL MISMATCH // RETRYING SCAN"
+                "SIGNAL MISMATCH. RETRYING SCAN"
             }
             color = if (uiState.failedAttempts == 0) OrionCyan else OrionAmber
         }
@@ -387,7 +385,7 @@ private fun SecurityStatus(
 
         AuthenticationUiState.AccessGranted -> {
             title = "ACCESS GRANTED"
-            detail = "IDENTITY CONFIRMED // WELCOME, COMMANDER"
+            detail = "IDENTITY CONFIRMED. WELCOME, COMMANDER"
             color = OrionCyan
         }
 
@@ -398,19 +396,15 @@ private fun SecurityStatus(
         Text(
             text = title,
             color = color,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 2.2.sp,
-            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(9.dp))
         Text(
             text = detail,
             color = if (uiState is AuthenticationUiState.Error) OrionText else OrionTextMuted,
-            fontSize = if (uiState is AuthenticationUiState.Error) 12.sp else 9.sp,
-            letterSpacing = if (uiState is AuthenticationUiState.Error) 0.4.sp else 1.1.sp,
-            lineHeight = 18.sp,
-            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -440,24 +434,6 @@ private fun SecurityFooter(
             )
             Spacer(modifier = Modifier.height(18.dp))
         }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = "ENCRYPTION // LOCAL",
-                color = OrionTextMuted,
-                fontSize = 8.sp,
-                letterSpacing = 1.sp,
-            )
-            Text(
-                text = "NODE STATUS // ISOLATED",
-                color = OrionTextMuted,
-                fontSize = 8.sp,
-                letterSpacing = 1.sp,
-            )
-        }
     }
 }
 
@@ -479,7 +455,7 @@ private fun CyberAction(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "[ $label ]",
+            text = "[$label]",
             color = OrionCyan,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,

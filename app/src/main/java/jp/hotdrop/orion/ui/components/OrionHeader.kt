@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,7 +31,6 @@ import jp.hotdrop.orion.navigation.OrionTopLevelDestination
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import jp.hotdrop.orion.ui.theme.OrionPanel
-import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
@@ -56,35 +54,26 @@ fun OrionHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            OrionSystemStatus()
+            OrionSystemStatus(title)
             OrionHeaderAction(
                 label = if (isShowingBackNavigation) "RETURN" else "CONFIG",
                 accessibilityLabel = if (isShowingBackNavigation) "前の画面へ戻る" else "Settingsを開く",
                 onClick = if (isShowingBackNavigation) onBackClick else onSettingsClick,
             )
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = title,
-            modifier = Modifier.semantics { contentDescription = "現在の画面: $title" },
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.6.sp,
-        )
     }
 }
 
 @Composable
-private fun OrionSystemStatus() {
+private fun OrionSystemStatus(
+    title: String
+) {
     Column {
         Text(
-            text = "O R I O N",
+            text = "ORION",
             color = OrionCyan,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 4.sp,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -94,10 +83,9 @@ private fun OrionSystemStatus() {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "SYSTEM ONLINE // LOCAL NODE",
-                color = OrionTextMuted,
-                fontSize = 10.sp,
-                letterSpacing = 1.sp,
+                text = title,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

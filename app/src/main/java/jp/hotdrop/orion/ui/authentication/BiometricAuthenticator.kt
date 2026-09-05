@@ -79,7 +79,7 @@ class AndroidBiometricAuthenticator(
                 BiometricManager.Authenticators.DEVICE_CREDENTIAL
 
         val PROMPT_INFO: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("ORION // IDENTITY VERIFICATION")
+            .setTitle("ORION IDENTITY VERIFICATION")
             .setSubtitle("セキュアノードへのアクセスを認証します")
             .setAllowedAuthenticators(ALLOWED_AUTHENTICATORS)
             .build()
