@@ -58,16 +58,16 @@ internal fun OrionAppShell(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    val isShowingSettings = currentRoute == OrionDestination.SettingsRoute
-    val isShowingArchiveEditor = currentRoute == OrionDestination.ArchiveNewRoute || currentRoute == OrionDestination.ArchiveEditRoute
+    val isShowingSettings = currentRoute == OrionDestination.SETTINGS_ROUTE
+    val isShowingArchiveEditor = currentRoute == OrionDestination.ARCHIVE_NEW_ROUTE || currentRoute == OrionDestination.ARCHIVE_EDIT_ROUTE
     val isShowingMemoEditor = currentRoute == OrionDestination.INCOMING_MEMO_ROUTE
     val isShowingSecondaryDestination = isShowingSettings || isShowingArchiveEditor || isShowingMemoEditor
     val currentTopLevelDestination = OrionTopLevelDestination.fromRoute(currentRoute) ?: selectedDestination
     val currentTitle = when {
         isShowingMemoEditor -> "EDIT PERSONAL NOTE"
-        isShowingSettings -> OrionDestination.SettingsTitle
-        currentRoute == OrionDestination.ArchiveNewRoute -> OrionDestination.ArchiveNewTitle
-        currentRoute == OrionDestination.ArchiveEditRoute -> OrionDestination.ArchiveEditTitle
+        isShowingSettings -> OrionDestination.SETTINGS_TITLE
+        currentRoute == OrionDestination.ARCHIVE_NEW_ROUTE -> OrionDestination.ARCHIVE_NEW_TITLE
+        currentRoute == OrionDestination.ARCHIVE_EDIT_ROUTE -> OrionDestination.ARCHIVE_EDIT_TITLE
         else -> currentTopLevelDestination.title
     }
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -85,7 +85,7 @@ internal fun OrionAppShell(
                 title = currentTitle,
                 isShowingBackNavigation = isShowingSecondaryDestination,
                 onSettingsClick = {
-                    navController.navigate(OrionDestination.SettingsRoute) {
+                    navController.navigate(OrionDestination.SETTINGS_ROUTE) {
                         launchSingleTop = true
                     }
                 },

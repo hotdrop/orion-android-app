@@ -99,5 +99,4 @@ Google Drive連携を利用するには、ローカル実行であってもGoogl
 ---
 
 # Screen Shot
-![生体認証画面](./images/01_auth_image.png)　
-![トップ画面](./images/02_top_image.png)
+![生体認証画面](./images/01_auth_image.png)　![トップ画面](./images/02_top_image.png)

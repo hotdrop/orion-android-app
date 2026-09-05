@@ -57,15 +57,15 @@ class OrionNavigationTest {
                                         modifier = Modifier
                                             .semantics { contentDescription = "新しい記録を追加" }
                                             .clickable {
-                                                navController.navigate(OrionDestination.ArchiveNewRoute)
+                                                navController.navigate(OrionDestination.ARCHIVE_NEW_ROUTE)
                                             },
                                     )
                                 }
                             }
-                            composable(OrionDestination.ArchiveNewRoute) {
+                            composable(OrionDestination.ARCHIVE_NEW_ROUTE) {
                                 Text("TITLE", modifier = Modifier.testTag(ArchiveTitleInputTag))
                             }
-                            composable(OrionDestination.SettingsRoute) {
+                            composable(OrionDestination.SETTINGS_ROUTE) {
                                 Text(
                                     text = "SELECT DRIVE FOLDER",
                                     modifier = Modifier.testTag(SelectDriveFolderButtonTag),

@@ -28,11 +28,11 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     onSelectFolder: () -> Unit,
     onClearFolder: () -> Unit,
+    modifier: Modifier = Modifier,
     onOpenFolder: (DriveFolderItem) -> Unit = {},
     onNavigateToParentFolder: () -> Unit = {},
     onConfirmFolder: () -> Unit = {},
-    onCancelFolderSelection: () -> Unit = {},
-    modifier: Modifier = Modifier,
+    onCancelFolderSelection: () -> Unit = {}
 ) {
     val status = uiState.toStatusPresentation()
 

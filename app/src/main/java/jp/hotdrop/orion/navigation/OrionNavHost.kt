@@ -28,7 +28,7 @@ fun OrionNavHost(
         composable(OrionTopLevelDestination.Incoming.route) {
             IncomingIntelligenceRoute(
                 onOpenSettings = {
-                    navController.navigate(OrionDestination.SettingsRoute) {
+                    navController.navigate(OrionDestination.SETTINGS_ROUTE) {
                         launchSingleTop = true
                     }
                 },
@@ -44,23 +44,23 @@ fun OrionNavHost(
         }
         composable(OrionTopLevelDestination.Archive.route) {
             KnowledgeArchiveRoute(
-                onCreateEntry = { navController.navigate(OrionDestination.ArchiveNewRoute) },
+                onCreateEntry = { navController.navigate(OrionDestination.ARCHIVE_NEW_ROUTE) },
                 onEditEntry = { entryId ->
                     navController.navigate(OrionDestination.archiveEditRoute(entryId))
                 },
                 modifier = Modifier,
             )
         }
-        composable(OrionDestination.ArchiveNewRoute) {
+        composable(OrionDestination.ARCHIVE_NEW_ROUTE) {
             KnowledgeArchiveEditorRoute(
                 onClose = navController::popBackStack,
                 modifier = Modifier,
             )
         }
         composable(
-            route = OrionDestination.ArchiveEditRoute,
+            route = OrionDestination.ARCHIVE_EDIT_ROUTE,
             arguments = listOf(
-                navArgument(OrionDestination.ArchiveEntryIdArgument) {
+                navArgument(OrionDestination.ARCHIVE_ENTRY_ID_ARGUMENT) {
                     type = NavType.LongType
                 },
             ),
@@ -70,7 +70,7 @@ fun OrionNavHost(
                 modifier = Modifier,
             )
         }
-        composable(OrionDestination.SettingsRoute) {
+        composable(OrionDestination.SETTINGS_ROUTE) {
             SettingsRoute(modifier = Modifier)
         }
     }
