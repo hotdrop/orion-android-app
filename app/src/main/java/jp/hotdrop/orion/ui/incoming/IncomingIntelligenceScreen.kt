@@ -89,8 +89,16 @@ fun IncomingIntelligenceScreen(
         }
 
         FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FilterChip(selected = !uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(false) }, label = { Text("ALL") })
-            FilterChip(selected = uiState.favoritesOnly, onClick = { onFavoritesOnlyChanged(true) }, label = { Text("FAVORITE") })
+            FilterChip(
+                selected = !uiState.favoritesOnly,
+                onClick = { onFavoritesOnlyChanged(false) },
+                label = { Text("ALL") }
+            )
+            FilterChip(
+                selected = uiState.favoritesOnly,
+                onClick = { onFavoritesOnlyChanged(true) },
+                label = { Text("MARK") }
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         when {
