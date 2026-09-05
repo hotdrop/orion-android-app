@@ -7,13 +7,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "settings")
 data class SettingsEntity(
     @PrimaryKey
-    val id: Int = SingletonId,
+    val id: Int = SINGLETON_ID,
     @ColumnInfo(name = "google_drive_path")
     val googleDrivePath: String,
     @ColumnInfo(name = "google_drive_folder_id")
     val googleDriveFolderId: String? = null,
 ) {
     companion object {
-        const val SingletonId = 1
+        const val SINGLETON_ID = 1
     }
 }

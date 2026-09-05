@@ -27,7 +27,7 @@ class KnowledgeArchiveEditorViewModel @Inject constructor(
     private val repository: KnowledgeArchiveRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val entryId: Long? = savedStateHandle[OrionDestination.ArchiveEntryIdArgument]
+    private val entryId: Long? = savedStateHandle[OrionDestination.ARCHIVE_ENTRY_ID_ARGUMENT]
     private val _uiState = MutableStateFlow(
         KnowledgeArchiveEditorUiState(
             entryId = entryId,

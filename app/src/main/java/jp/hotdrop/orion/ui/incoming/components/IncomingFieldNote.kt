@@ -39,8 +39,8 @@ import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlin.time.Duration.Companion.milliseconds
 
-/** A two-line viewport; the full note is measured once and only its draw offset animates. */
 @Composable
 internal fun IncomingFieldNote(
     title: String,
@@ -85,7 +85,7 @@ internal fun IncomingFieldNote(
             LaunchedEffect(layout, shouldScroll, durationScale) {
                 offset.snapTo(0f)
                 if (shouldScroll) {
-                    delay(NOTE_INITIAL_PAUSE_MILLIS)
+                    delay(NOTE_INITIAL_PAUSE_MILLIS.milliseconds)
                     val duration = (cycleHeight / lineHeight * NOTE_LINE_SCROLL_MILLIS).toInt().coerceAtLeast(1)
                     while (isActive) {
                         offset.animateTo(cycleHeight, tween(duration, easing = LinearEasing))

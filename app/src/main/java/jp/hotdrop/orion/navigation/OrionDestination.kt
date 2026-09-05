@@ -32,13 +32,13 @@ object OrionDestination {
     const val INCOMING_DOCUMENT_ID = "documentId"
     fun incomingMemoRoute(documentId: String): String = "incoming/memo/${Uri.encode(documentId)}"
 
-    const val SettingsRoute = "settings"
-    const val SettingsTitle = "SYSTEM SETTINGS"
-    const val ArchiveNewRoute = "archive/new"
-    const val ArchiveEditRoute = "archive/edit/{entryId}"
-    const val ArchiveEntryIdArgument = "entryId"
-    const val ArchiveNewTitle = "NEW KNOWLEDGE RECORD"
-    const val ArchiveEditTitle = "EDIT KNOWLEDGE RECORD"
+    const val SETTINGS_ROUTE = "settings"
+    const val SETTINGS_TITLE = "SYSTEM SETTINGS"
+    const val ARCHIVE_NEW_ROUTE = "archive/new"
+    const val ARCHIVE_EDIT_ROUTE = "archive/edit/{entryId}"
+    const val ARCHIVE_ENTRY_ID_ARGUMENT = "entryId"
+    const val ARCHIVE_NEW_TITLE = "NEW KNOWLEDGE RECORD"
+    const val ARCHIVE_EDIT_TITLE = "EDIT KNOWLEDGE RECORD"
 
     fun archiveEditRoute(entryId: Long): String = "archive/edit/$entryId"
 }

@@ -13,15 +13,15 @@ class OrionViewModel @Inject constructor(
 ) : ViewModel() {
     val selectedDestination: StateFlow<OrionTopLevelDestination> =
         savedStateHandle.getStateFlow(
-            key = SelectedDestinationKey,
+            key = SELECTED_DESTINATION_KEY,
             initialValue = OrionTopLevelDestination.Incoming,
         )
 
     fun selectDestination(destination: OrionTopLevelDestination) {
-        savedStateHandle[SelectedDestinationKey] = destination
+        savedStateHandle[SELECTED_DESTINATION_KEY] = destination
     }
 
     private companion object {
-        const val SelectedDestinationKey = "selected_destination"
+        const val SELECTED_DESTINATION_KEY = "selected_destination"
     }
 }
