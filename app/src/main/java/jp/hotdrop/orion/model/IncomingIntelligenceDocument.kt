@@ -10,4 +10,7 @@ data class IncomingIntelligenceDocument(
     val relativePath: String,
     val webUrl: String,
     val isNew: Boolean,
+    val isFavorite: Boolean = false,
+    val memo: String = "",
+    val isSyncTarget: Boolean = true,
 )

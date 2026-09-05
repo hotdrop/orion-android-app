@@ -31,6 +31,9 @@ data class IncomingIntelligenceRecord(
     val relativePath: String,
     val webUrl: String,
     val isNew: Boolean,
+    val isFavorite: Boolean = false,
+    val memo: String = "",
+    val isSyncTarget: Boolean = true,
 )
 
 internal fun IncomingIntelligenceEntity.toRecord() = IncomingIntelligenceRecord(

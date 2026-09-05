@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -39,8 +41,6 @@ internal const val IncomingSyncButtonTag = "incoming_sync_button"
 
 @Composable
 fun IncomingIntelligenceHeader(
-    documentCount: Int,
-    newDocumentCount: Int,
     lastSyncedAtLabel: String?,
     isSyncing: Boolean,
     syncEnabled: Boolean,
@@ -56,29 +56,16 @@ fun IncomingIntelligenceHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "MODULE // IN",
-                color = OrionCyan,
-                fontSize = 10.sp,
-                letterSpacing = 1.4.sp,
-            )
-            Text(
                 text = "SIGNAL ACQUISITION GRID",
                 color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.1.sp,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "$documentCount SIGNALS // $newDocumentCount NEW",
-                color = OrionTextMuted,
-                fontSize = 10.sp,
-                letterSpacing = 1.sp,
-            )
-            Text(
-                text = "LAST // ${lastSyncedAtLabel ?: "--"}",
-                color = OrionTextMuted,
-                fontSize = 9.sp,
-                letterSpacing = 0.8.sp,
+                text = "LAST ${lastSyncedAtLabel ?: "--"}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = OrionTextMuted
             )
         }
         IncomingSyncReactor(
@@ -193,8 +180,6 @@ private val SyncReactorArcStartAngles = floatArrayOf(-82f, 8f, 98f, 188f)
 private fun IncomingIntelligenceHeaderReadyPreview() {
     OrionTheme {
         IncomingIntelligenceHeader(
-            documentCount = 12,
-            newDocumentCount = 3,
             lastSyncedAtLabel = "08/01 09:45",
             isSyncing = false,
             syncEnabled = true,
@@ -208,8 +193,6 @@ private fun IncomingIntelligenceHeaderReadyPreview() {
 private fun IncomingIntelligenceHeaderSyncingPreview() {
     OrionTheme {
         IncomingIntelligenceHeader(
-            documentCount = 12,
-            newDocumentCount = 3,
             lastSyncedAtLabel = "08/01 09:45",
             isSyncing = true,
             syncEnabled = false,
@@ -223,8 +206,6 @@ private fun IncomingIntelligenceHeaderSyncingPreview() {
 private fun IncomingIntelligenceHeaderDisabledPreview() {
     OrionTheme {
         IncomingIntelligenceHeader(
-            documentCount = 0,
-            newDocumentCount = 0,
             lastSyncedAtLabel = null,
             isSyncing = false,
             syncEnabled = false,
