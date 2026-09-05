@@ -19,6 +19,9 @@ fun IncomingIntelligenceDocumentList(
     documents: List<IncomingIntelligenceDocument>,
     onOpenDocument: (IncomingIntelligenceDocument) -> Unit,
     modifier: Modifier = Modifier,
+    onToggleFavorite: (String) -> Unit = {},
+    onEditMemo: (String) -> Unit = {},
+    onRequestDelete: (IncomingIntelligenceDocument) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier
@@ -33,7 +36,12 @@ fun IncomingIntelligenceDocumentList(
             IncomingIntelligenceDocumentCard(
                 title = document.title,
                 updatedAtLabel = document.updatedAtLabel,
-                relativePath = document.relativePath,
+                isFavorite = document.isFavorite,
+                memo = document.memo,
+                isSyncTarget = document.isSyncTarget,
+                onToggleFavorite = { onToggleFavorite(document.id) },
+                onEditMemo = { onEditMemo(document.id) },
+                onDelete = { onRequestDelete(document) },
                 isNew = document.isNew,
                 onClick = { onOpenDocument(document) },
             )

@@ -1,5 +1,7 @@
 package jp.hotdrop.orion.ui.incoming
 
+import androidx.lifecycle.SavedStateHandle
+import jp.hotdrop.orion.data.IncomingPersonalRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,14 +35,64 @@ import kotlinx.coroutines.launch
 class IncomingIntelligenceViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val incomingRepository: IncomingIntelligenceRepository,
+    private val personalRepository: IncomingPersonalRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(IncomingIntelligenceUiState())
+    private val _uiState = MutableStateFlow(IncomingIntelligenceUiState(favoritesOnly = savedStateHandle["favoritesOnly"] ?: false))
     val uiState: StateFlow<IncomingIntelligenceUiState> = _uiState.asStateFlow()
 
     private var currentTarget: GoogleDriveTarget? = null
 
     init {
         observeLocalState()
+    }
+
+    fun setFavoritesOnly(enabled: Boolean) {
+        savedStateHandle["favoritesOnly"] = enabled
+        _uiState.update { it.copy(favoritesOnly = enabled) }
+    }
+
+    fun toggleFavorite(id: String) = viewModelScope.launch {
+        _uiState.update { it.copy(actionErrorMessage = null) }
+        try {
+            personalRepository.toggleFavorite(id)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            logFailure("Failed to update favorite", error)
+            _uiState.update { it.copy(actionErrorMessage = "お気に入りを保存できませんでした。再試行してください。") }
+        }
+    }
+
+    fun requestDelete(document: IncomingIntelligenceDocument) {
+        if (!document.isSyncTarget) _uiState.update { it.copy(pendingDelete = document, actionErrorMessage = null) }
+    }
+
+    fun dismissDelete() {
+        if (!_uiState.value.isDeleting) _uiState.update { it.copy(pendingDelete = null) }
+    }
+
+    fun confirmDelete() {
+        val document = _uiState.value.pendingDelete ?: return
+        if (_uiState.value.isDeleting) return
+        _uiState.update { it.copy(isDeleting = true, actionErrorMessage = null) }
+        viewModelScope.launch {
+            try {
+                personalRepository.deleteLocalRecord(document.id)
+                _uiState.update { it.copy(pendingDelete = null) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                logFailure("Failed to delete personal record", error)
+                _uiState.update { it.copy(actionErrorMessage = "ローカル記録を削除できませんでした。") }
+            } finally {
+                _uiState.update { it.copy(isDeleting = false) }
+            }
+        }
+    }
+
+    fun reportOpenFailure() {
+        _uiState.update { it.copy(actionErrorMessage = "資料を開けませんでした。対応アプリやURLを確認してください。") }
     }
 
     fun beginSynchronization(): Boolean {
@@ -103,15 +155,11 @@ class IncomingIntelligenceViewModel @Inject constructor(
             settingsRepository.observeDriveTarget()
                 .flatMapLatest { target ->
                     currentTarget = target
-                    if (target == null) {
-                        flowOf(LocalIncomingState(null, emptyList(), null))
-                    } else {
-                        combine(
-                            incomingRepository.observeDocuments(target.folderId),
-                            incomingRepository.observeLastSyncedAt(target.folderId),
-                        ) { documents, lastSyncedAt ->
-                            LocalIncomingState(target, documents, lastSyncedAt)
-                        }
+                    combine(
+                        personalRepository.observeDocuments(target?.folderId),
+                        target?.let { incomingRepository.observeLastSyncedAt(it.folderId) } ?: flowOf(null),
+                    ) { documents, lastSyncedAt ->
+                        LocalIncomingState(target, documents, lastSyncedAt)
                     }
                 }
                 .catch { error ->
@@ -139,6 +187,9 @@ class IncomingIntelligenceViewModel @Inject constructor(
         relativePath = record.relativePath,
         webUrl = record.webUrl,
         isNew = record.isNew,
+        isFavorite = record.isFavorite,
+        memo = record.memo,
+        isSyncTarget = record.isSyncTarget,
     )
 
     private fun syncErrorMessage(error: Exception): String = when {

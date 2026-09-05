@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.runtime.mutableStateOf
 import jp.hotdrop.orion.model.IncomingIntelligenceDocument
 import jp.hotdrop.orion.ui.incoming.components.IncomingDocumentListTag
 import jp.hotdrop.orion.ui.incoming.components.IncomingSyncButtonTag
@@ -22,6 +23,56 @@ import org.junit.Test
 class IncomingIntelligenceScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
+
+    @Test
+    fun personalActions_doNotOpenDocument_andFavoritesFilterWorks() {
+        val first = IncomingIntelligenceDocument("first", "Compose notes", "09/05", "/", "https://example.com", false, true, "Useful notes")
+        val second = first.copy(id = "second", title = "Other notes", isFavorite = false)
+        val state = mutableStateOf(IncomingIntelligenceUiState(isDriveConfigured = true, documents = listOf(first, second)))
+        var opens = 0
+        var favorites = 0
+        var edited: String? = null
+        composeRule.setContent {
+            OrionTheme {
+                IncomingIntelligenceScreen(state.value, {}, {}, { opens++ },
+                    onToggleFavorite = { favorites++ },
+                    onEditMemo = { edited = it },
+                    onFavoritesOnlyChanged = { enabled -> state.value = state.value.copy(favoritesOnly = enabled) },
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("Compose notesのお気に入りを解除").performClick()
+        composeRule.onNodeWithContentDescription("Compose notesの概要メモを編集").performClick()
+        assertEquals(0, opens)
+        assertEquals(1, favorites)
+        assertEquals("first", edited)
+        composeRule.onNodeWithText("★ / お気に入り").performClick()
+        composeRule.onNodeWithText("Other notes").assertDoesNotExist()
+        composeRule.onNodeWithText("Compose notes").assertIsDisplayed()
+    }
+
+    @Test
+    fun retainedDocumentWithoutDrive_showsMemoAndDeleteConfirmation() {
+        val document = IncomingIntelligenceDocument("retained", "同期対象外の技術資料", "09/05", "/", "https://example.com", false, true,
+            "再コンポーズの計測方法と、最適化の判断基準を整理した資料。次の実装前に読み返す。", false)
+        val state = mutableStateOf(IncomingIntelligenceUiState(documents = listOf(document)))
+        var deletes = 0
+        composeRule.setContent {
+            OrionTheme {
+                IncomingIntelligenceScreen(state.value, {}, {}, {},
+                    onRequestDelete = { state.value = state.value.copy(pendingDelete = it) },
+                    onConfirmDelete = { deletes++ },
+                    onDismissDelete = { state.value = state.value.copy(pendingDelete = null) },
+                )
+            }
+        }
+        composeRule.onNodeWithText("同期対象外").assertIsDisplayed()
+        composeRule.onNodeWithText("REMOVE").performClick()
+        assertEquals(0, deletes)
+        composeRule.onNodeWithText("ローカル記録を削除").assertIsDisplayed()
+        composeRule.onNodeWithText("削除").performClick()
+        assertEquals(1, deletes)
+    }
 
     @Test
     fun notConfigured_showsConfigAction() {

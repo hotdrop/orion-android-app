@@ -38,6 +38,16 @@ interface IncomingIntelligenceDao {
     )
     suspend fun markOpened(rootFolderId: String, driveFileId: String)
 
+    @Query("""
+        UPDATE incoming_personal_documents SET
+            title = (SELECT title FROM incoming_intelligence_documents WHERE root_folder_id = :rootFolderId AND drive_file_id = incoming_personal_documents.drive_file_id),
+            modified_at = (SELECT modified_at FROM incoming_intelligence_documents WHERE root_folder_id = :rootFolderId AND drive_file_id = incoming_personal_documents.drive_file_id),
+            relative_path = (SELECT relative_path FROM incoming_intelligence_documents WHERE root_folder_id = :rootFolderId AND drive_file_id = incoming_personal_documents.drive_file_id),
+            web_url = (SELECT web_url FROM incoming_intelligence_documents WHERE root_folder_id = :rootFolderId AND drive_file_id = incoming_personal_documents.drive_file_id)
+        WHERE drive_file_id IN (SELECT drive_file_id FROM incoming_intelligence_documents WHERE root_folder_id = :rootFolderId)
+    """)
+    suspend fun refreshPersonalSnapshots(rootFolderId: String)
+
     @Transaction
     suspend fun replaceForRoot(
         rootFolderId: String,
@@ -46,6 +56,7 @@ interface IncomingIntelligenceDao {
     ) {
         deleteForRoot(rootFolderId)
         if (documents.isNotEmpty()) insertAll(documents)
+        refreshPersonalSnapshots(rootFolderId)
         upsertSyncState(IncomingIntelligenceSyncStateEntity(rootFolderId, syncedAt))
     }
 }

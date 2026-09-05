@@ -1,5 +1,7 @@
 package jp.hotdrop.orion.di
 
+import jp.hotdrop.orion.data.local.dao.IncomingPersonalDao
+import jp.hotdrop.orion.data.local.MIGRATION_1_2
 import android.content.Context
 import androidx.room.Room
 import dagger.Module
@@ -25,7 +27,7 @@ object AppModule {
             context,
             OrionDatabase::class.java,
             OrionDatabase.DATABASE_NAME,
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
 
     @Provides
     @Singleton
@@ -39,6 +41,11 @@ object AppModule {
     @Singleton
     fun provideIncomingIntelligenceDao(database: OrionDatabase): IncomingIntelligenceDao =
         database.incomingIntelligenceDao()
+
+    @Provides
+    @Singleton
+    fun provideIncomingPersonalDao(database: OrionDatabase): IncomingPersonalDao =
+        database.incomingPersonalDao()
 
     @Provides
     @Singleton

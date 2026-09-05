@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,10 +37,15 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 fun IncomingIntelligenceDocumentCard(
     title: String,
     updatedAtLabel: String,
-    relativePath: String,
     isNew: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    memo: String = "",
+    isSyncTarget: Boolean = true,
+    onToggleFavorite: () -> Unit = {},
+    onEditMemo: () -> Unit = {},
+    onDelete: () -> Unit = {},
 ) {
     val signalColor = if (isNew) OrionCyan else OrionCyanMuted
 
@@ -46,8 +54,6 @@ fun IncomingIntelligenceDocumentCard(
             .fillMaxWidth()
             .border(1.dp, signalColor.copy(alpha = 0.8f), IncomingDocumentCardShape)
             .background(OrionPanelElevated.copy(alpha = 0.55f), IncomingDocumentCardShape)
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = "${title}を文書アプリで開く" }
             .padding(16.dp),
     ) {
         Row(
@@ -56,7 +62,7 @@ fun IncomingIntelligenceDocumentCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (isNew) "NEW SIGNAL // UNREAD" else "ARCHIVED SIGNAL // CACHED",
+                text = if (isNew) "NEW SIGNAL // UNREAD" else "ARCHIVED SIGNAL // READ",
                 modifier = Modifier.weight(1f),
                 color = signalColor,
                 fontSize = 9.sp,
@@ -73,32 +79,40 @@ fun IncomingIntelligenceDocumentCard(
         Text(
             text = title,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                .clickable(role = Role.Button, onClick = onClick)
+                .semantics { contentDescription = "${title}を文書アプリで開く" },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "PATH // $relativePath",
-                modifier = Modifier.weight(1f),
-                color = OrionTextMuted,
-                fontSize = 10.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = "[ OPEN ]",
-                color = OrionCyan,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp,
-            )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconToggleButton(
+                checked = isFavorite,
+                onCheckedChange = { onToggleFavorite() },
+                modifier = Modifier.semantics {
+                    contentDescription = if (isFavorite) "${title}のお気に入りを解除" else "${title}をお気に入りに追加"
+                },
+            ) {
+                Text(if (isFavorite) "★" else "☆", color = OrionCyan, fontSize = 24.sp)
+            }
+            if (!isSyncTarget) {
+                Text("同期対象外", color = OrionTextMuted, modifier = Modifier.weight(1f))
+                TextButton(onClick = onDelete) { Text("REMOVE", color = OrionCyan) }
+            }
         }
+        Text(
+            text = memo.ifBlank { "ADD NOTE" },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                .clickable(role = Role.Button, onClick = onEditMemo)
+                .semantics { contentDescription = "${title}の概要メモを編集" }
+                .padding(vertical = 8.dp),
+            color = if (memo.isBlank()) OrionCyan else MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -111,7 +125,6 @@ private fun IncomingIntelligenceDocumentCardNewPreview() {
         IncomingIntelligenceDocumentCard(
             title = "Jetpack Composeの描画パフォーマンスを安定させるための実践ガイド",
             updatedAtLabel = "08/01 09:42",
-            relativePath = "Android/Compose/Weekly",
             isNew = true,
             onClick = {},
         )
@@ -125,7 +138,6 @@ private fun IncomingIntelligenceDocumentCardCachedPreview() {
         IncomingIntelligenceDocumentCard(
             title = "Agentic RAG: Production Architecture Notes",
             updatedAtLabel = "07/29 22:16",
-            relativePath = "AI/RAG/Research/Long/Nested/Path",
             isNew = false,
             onClick = {},
         )

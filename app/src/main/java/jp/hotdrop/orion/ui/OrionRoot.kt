@@ -60,9 +60,11 @@ internal fun OrionAppShell(
     val currentRoute = currentBackStackEntry?.destination?.route
     val isShowingSettings = currentRoute == OrionDestination.SettingsRoute
     val isShowingArchiveEditor = currentRoute == OrionDestination.ArchiveNewRoute || currentRoute == OrionDestination.ArchiveEditRoute
-    val isShowingSecondaryDestination = isShowingSettings || isShowingArchiveEditor
+    val isShowingMemoEditor = currentRoute == OrionDestination.INCOMING_MEMO_ROUTE
+    val isShowingSecondaryDestination = isShowingSettings || isShowingArchiveEditor || isShowingMemoEditor
     val currentTopLevelDestination = OrionTopLevelDestination.fromRoute(currentRoute) ?: selectedDestination
     val currentTitle = when {
+        isShowingMemoEditor -> "EDIT PERSONAL NOTE"
         isShowingSettings -> OrionDestination.SettingsTitle
         currentRoute == OrionDestination.ArchiveNewRoute -> OrionDestination.ArchiveNewTitle
         currentRoute == OrionDestination.ArchiveEditRoute -> OrionDestination.ArchiveEditTitle

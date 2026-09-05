@@ -192,6 +192,8 @@ private class FakeIncomingDao(initialDocuments: List<IncomingIntelligenceEntity>
         }
     }
 
+    override suspend fun refreshPersonalSnapshots(rootFolderId: String) = Unit
+
     override suspend fun replaceForRoot(
         rootFolderId: String,
         documents: List<IncomingIntelligenceEntity>,

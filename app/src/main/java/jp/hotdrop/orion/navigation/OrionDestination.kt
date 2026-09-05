@@ -1,5 +1,6 @@
 package jp.hotdrop.orion.navigation
 
+import android.net.Uri
 enum class OrionTopLevelDestination(
     val route: String,
     val title: String,
@@ -27,6 +28,10 @@ enum class OrionTopLevelDestination(
 }
 
 object OrionDestination {
+    const val INCOMING_MEMO_ROUTE = "incoming/memo/{documentId}"
+    const val INCOMING_DOCUMENT_ID = "documentId"
+    fun incomingMemoRoute(documentId: String): String = "incoming/memo/${Uri.encode(documentId)}"
+
     const val SettingsRoute = "settings"
     const val SettingsTitle = "SYSTEM SETTINGS"
     const val ArchiveNewRoute = "archive/new"

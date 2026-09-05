@@ -1,5 +1,6 @@
 package jp.hotdrop.orion.navigation
 
+import jp.hotdrop.orion.ui.incoming.IncomingMemoRoute
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -31,8 +32,15 @@ fun OrionNavHost(
                         launchSingleTop = true
                     }
                 },
+                onEditMemo = { id -> navController.navigate(OrionDestination.incomingMemoRoute(id)) },
                 modifier = Modifier,
             )
+        }
+        composable(
+            route = OrionDestination.INCOMING_MEMO_ROUTE,
+            arguments = listOf(navArgument(OrionDestination.INCOMING_DOCUMENT_ID) { type = NavType.StringType }),
+        ) {
+            IncomingMemoRoute(onClose = { navController.popBackStack() })
         }
         composable(OrionTopLevelDestination.Archive.route) {
             KnowledgeArchiveRoute(

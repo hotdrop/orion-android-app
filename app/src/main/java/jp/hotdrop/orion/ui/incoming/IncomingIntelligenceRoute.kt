@@ -16,6 +16,7 @@ import jp.hotdrop.orion.ui.drive.rememberGoogleDriveAuthorization
 @Composable
 fun IncomingIntelligenceRoute(
     onOpenSettings: () -> Unit,
+    onEditMemo: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IncomingIntelligenceViewModel = hiltViewModel(),
 ) {
@@ -40,8 +41,16 @@ fun IncomingIntelligenceRoute(
         onOpenDocument = { document ->
             if (openExternalDocument(context, document.webUrl)) {
                 viewModel.markDocumentOpened(document.id)
+            } else {
+                viewModel.reportOpenFailure()
             }
         },
+        onToggleFavorite = viewModel::toggleFavorite,
+        onFavoritesOnlyChanged = viewModel::setFavoritesOnly,
+        onEditMemo = onEditMemo,
+        onRequestDelete = viewModel::requestDelete,
+        onDismissDelete = viewModel::dismissDelete,
+        onConfirmDelete = viewModel::confirmDelete,
         modifier = modifier,
     )
 }
