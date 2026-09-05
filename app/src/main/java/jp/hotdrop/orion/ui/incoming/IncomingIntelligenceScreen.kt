@@ -2,10 +2,13 @@ package jp.hotdrop.orion.ui.incoming
 
 import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -26,6 +29,9 @@ import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceNoDocuments
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceStatusPanel
 import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceUiState
 import jp.hotdrop.orion.ui.theme.OrionDeepNavy
+import jp.hotdrop.orion.ui.theme.OrionCyan
+import jp.hotdrop.orion.ui.theme.OrionCyanMuted
+import jp.hotdrop.orion.ui.theme.OrionPanelElevated
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @Composable
@@ -88,16 +94,29 @@ fun IncomingIntelligenceScreen(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
+        val filterColors = FilterChipDefaults.filterChipColors(
+            containerColor = OrionDeepNavy,
+            labelColor = OrionTextMuted,
+            selectedContainerColor = OrionPanelElevated,
+            selectedLabelColor = OrionCyan,
+        )
+        val filterShape = CutCornerShape(topStart = 6.dp, bottomEnd = 6.dp)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             FilterChip(
                 selected = !uiState.favoritesOnly,
                 onClick = { onFavoritesOnlyChanged(false) },
-                label = { Text("ALL") }
+                label = { Text("ALL") },
+                colors = filterColors,
+                shape = filterShape,
+                border = BorderStroke(1.dp, if (!uiState.favoritesOnly) OrionCyan else OrionCyanMuted),
             )
             FilterChip(
                 selected = uiState.favoritesOnly,
                 onClick = { onFavoritesOnlyChanged(true) },
-                label = { Text("MARK") }
+                label = { Text("MARK") },
+                colors = filterColors,
+                shape = filterShape,
+                border = BorderStroke(1.dp, if (uiState.favoritesOnly) OrionCyan else OrionCyanMuted),
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -106,7 +125,7 @@ fun IncomingIntelligenceScreen(
                 onOpenSettings = onOpenSettings,
             )
 
-            uiState.favoritesOnly && visibleDocuments.isEmpty() -> Text("お気に入りの資料はありません。", color = OrionTextMuted)
+            uiState.favoritesOnly && visibleDocuments.isEmpty() -> Text("Not MARK documents", color = OrionTextMuted)
             uiState.documents.isEmpty() && uiState.isSyncing -> IncomingIntelligenceInitialSync()
             uiState.documents.isEmpty() -> IncomingIntelligenceNoDocuments(onSync = onSync)
             else -> IncomingIntelligenceDocumentList(
@@ -164,6 +183,24 @@ private fun IncomingIntelligencePopulatedPreview() {
             uiState = IncomingIntelligenceUiState(
                 isDriveConfigured = true,
                 documents = PreviewDocuments,
+                lastSyncedAtLabel = "08/01 09:45",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
+@Composable
+private fun IncomingIntelligenceFavoritesOnlyPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                favoritesOnly = true,
                 lastSyncedAtLabel = "08/01 09:45",
             ),
             onSync = {},
