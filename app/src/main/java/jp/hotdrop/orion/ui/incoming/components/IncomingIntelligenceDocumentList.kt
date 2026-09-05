@@ -7,10 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.hotdrop.orion.model.IncomingIntelligenceDocument
-import jp.hotdrop.orion.ui.theme.OrionTheme
 
 internal const val IncomingDocumentListTag = "incoming_document_list"
 
