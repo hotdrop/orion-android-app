@@ -1,5 +1,6 @@
 package jp.hotdrop.orion.ui.incoming
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.hotdrop.orion.ui.theme.OrionCyan
+import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import jp.hotdrop.orion.ui.theme.OrionDeepNavy
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
@@ -57,11 +59,17 @@ fun IncomingMemoScreen(
                     shape = CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = OrionCyan,
-                        unfocusedBorderColor = jp.hotdrop.orion.ui.theme.OrionCyanMuted,
+                        unfocusedBorderColor = OrionCyanMuted,
                         cursorColor = OrionCyan,
                     ),
                 )
-                TextButton(onClick = onSave, enabled = !state.isSaving, modifier = Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = onSave,
+                    enabled = !state.isSaving,
+                    shape = CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp),
+                    border = BorderStroke(1.dp, if (state.isSaving) OrionCyanMuted else OrionCyan),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(if (state.isSaving) "SAVING…" else "SAVE", color = OrionCyan)
                 }
             }
@@ -86,6 +94,17 @@ private fun IncomingMemoPreview() {
     OrionTheme {
         IncomingMemoScreen(
             state = IncomingMemoUiState(title = "Jetpack Composeのパフォーマンス調査", memo = "再コンポーズの測定方法と改善の手順。\n次の実装時に参照する。", isLoading = false, canSave = true),
+            onMemoChanged = {}, onSave = {}, onRetry = {}, onDismissDiscard = {}, onConfirmDiscard = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingMemoSavingPreview() {
+    OrionTheme {
+        IncomingMemoScreen(
+            state = IncomingMemoUiState(title = "Jetpack Composeのパフォーマンス調査", memo = "調査結果を保存中。", isLoading = false, canSave = true, isSaving = true),
             onMemoChanged = {}, onSave = {}, onRetry = {}, onDismissDiscard = {}, onConfirmDiscard = {},
         )
     }
