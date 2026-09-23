@@ -59,15 +59,31 @@ internal fun OrionAppShell(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val isShowingSettings = currentRoute == OrionDestination.SETTINGS_ROUTE
-    val isShowingArchiveEditor = currentRoute == OrionDestination.ARCHIVE_NEW_ROUTE || currentRoute == OrionDestination.ARCHIVE_EDIT_ROUTE
+    val isShowingArchiveEditor = when (currentRoute) {
+        OrionDestination.RECORD_EDIT_ROUTE,
+        OrionDestination.RECORD_DETAIL_ROUTE,
+        OrionDestination.ANALYSIS_ROUTE -> true
+        else -> false
+    }
     val isShowingMemoEditor = currentRoute == OrionDestination.INCOMING_MEMO_ROUTE
     val isShowingSecondaryDestination = isShowingSettings || isShowingArchiveEditor || isShowingMemoEditor
     val currentTopLevelDestination = OrionTopLevelDestination.fromRoute(currentRoute) ?: selectedDestination
     val currentTitle = when {
         isShowingMemoEditor -> "EDIT PERSONAL NOTE"
         isShowingSettings -> OrionDestination.SETTINGS_TITLE
-        currentRoute == OrionDestination.ARCHIVE_NEW_ROUTE -> OrionDestination.ARCHIVE_NEW_TITLE
-        currentRoute == OrionDestination.ARCHIVE_EDIT_ROUTE -> OrionDestination.ARCHIVE_EDIT_TITLE
+        currentRoute == OrionDestination.ANALYSIS_ROUTE -> "FOCUS ANALYSIS"
+        currentRoute == OrionDestination.RECORD_DETAIL_ROUTE -> {
+            if (currentBackStackEntry?.arguments?.getString("kind") == "focus") {
+                "FOCUS"
+            } else {
+                "SIGNAL"
+            }
+        }
+        currentRoute == OrionDestination.RECORD_EDIT_ROUTE -> when {
+            currentBackStackEntry?.arguments?.getString("kind") == "focus" -> "EDIT FOCUS"
+            currentBackStackEntry?.arguments?.getLong("recordId") == 0L -> "NEW SIGNAL"
+            else -> "EDIT SIGNAL"
+        }
         else -> currentTopLevelDestination.title
     }
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher

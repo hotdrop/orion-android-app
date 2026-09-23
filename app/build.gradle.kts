@@ -75,6 +75,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
+    // Room's migration test serializers require 1.8.1. Align the target debug APK too:
+    // AndroidTest uses the app runtime version through consistent resolution.
+    debugImplementation(libs.kotlinx.serialization.core)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

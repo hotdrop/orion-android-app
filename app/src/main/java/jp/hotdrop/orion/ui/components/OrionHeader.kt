@@ -54,7 +54,7 @@ fun OrionHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            OrionSystemStatus(title)
+            OrionSystemStatus(title, Modifier.weight(1f).padding(end = 8.dp))
             OrionHeaderAction(
                 label = if (isShowingBackNavigation) "RETURN" else "CONFIG",
                 accessibilityLabel = if (isShowingBackNavigation) "前の画面へ戻る" else "Settingsを開く",
@@ -66,9 +66,10 @@ fun OrionHeader(
 
 @Composable
 private fun OrionSystemStatus(
-    title: String
+    title: String,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier) {
         Text(
             text = "ORION",
             color = OrionCyan,

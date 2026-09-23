@@ -2,12 +2,12 @@
 
 ## 1. アプリの目的
 
-ORIONは、技術情報と読書メモを管理する個人用Androidアプリです。
+ORIONは、技術情報と自分の関心・思考を記録する個人用Androidアプリです。
 近未来のAI研究施設にある司令システムをテーマにし、「実用性よりもワクワクを優先する」という考え方で、UI、アニメーション、サウンド、触覚を設計します。
 ORIONの機能は次の2つです。
 
 - Incoming Intelligence
-- Knowledge Archive
+- Personal Intelligence
 
 ORIONへのアクセスは、アプリ起動時の端末認証で保護します。
 
@@ -77,39 +77,36 @@ ORIONへのアクセスは、アプリ起動時の端末認証で保護します
 
 オフラインや同期失敗時も、最後に取得できた一覧は表示し続けます。
 
-## 4. Knowledge Archive
+## 4. Personal Intelligence — Signal / Focus
 
-最近読んだ記事や書籍を記録する機能です。
+ARCHIVEは、自分が何に反応し、どう考えたかを端末内に蓄積する機能です。SIGNAL／FOCUSを切り替えて表示します。
 
-### 保存する情報
+### Signal
 
-- タイトル
-- URL
-- メモ
+- 気になった事柄を本文と任意のKeywordsで手入力します。本文は必須です。
+- 登録日時順に表示し、詳細から編集・確認付き削除ができます。編集しても登録日時は維持します。
+- 共通Keywordを持つFocusへのリンクを表示します。関連なしも正常な記録であり、解決・未解決の管理はしません。
 
-### 操作
+### Focus分析
 
-- 記録の追加、編集、削除を行えます。
-- 一覧の`NEW`操作から専用の新規作成画面を開きます。
-- 一覧の記録または`EDIT`操作から専用の編集画面を開きます。
-- 一覧の`OPEN LINK`操作から、対応アプリまたはブラウザでURLを開きます。
-- 保存に成功すると一覧へ戻ります。保存に失敗した場合は入力内容を維持して再試行できます。
-- ソフトキーボード表示中も編集内容をスクロールでき、フォーカス中の入力欄を表示領域内で操作できます。
-- 入力途中で戻る場合は変更の破棄を確認します。
-- 削除は編集画面から行い、実行前に確認します。
-- データは端末内へ保存し、Google Driveとは同期しません。
+- 分析開始時の新規Signal本文とKeywordsを固定し、ChatGPTへ渡すプロンプトを全文コピーできます。初回は全件、次回は前回保存した分析範囲より後に追加したSignalが対象です。
+- 対話中に追加したSignalは次回に回します。対象がない場合は新規分析を開始しません。
+- 回答を貼り付け、Keyword候補を選択・修正し、自分の考えをMy Noteへ記録して保存します。回答は必須、My NoteとKeywordsは任意です。
+- 分析途中の下書きは1件を端末内へ自動保存し、アプリ再起動後も再開できます。破棄には確認を設けます。保存失敗時は入力を保持して再試行できます。
+- Focus保存成功時だけ分析範囲を進めます。コピー、下書き破棄、保存済みFocusの編集・削除では分析範囲を変更しません。
 
-### 入力条件と表示状態
+### Focus履歴と関連
 
-- タイトルとHTTPまたはHTTPSのURLは必須です。メモは任意です。
-- 記録は更新日時が新しい順に表示し、同じURLの記録も個別に保存できます。
-- 一覧には読み込み中、記録なし、記録一覧、読込エラー、URL起動エラーを表示します。
-- 編集画面には読込中、未保存変更、入力エラー、保存中、保存エラー、削除中、削除エラーを表示します。
+- 1回の回答全体を1件のFocusとして、分析開始日時順に表示します。
+- 詳細でChatGPT Analysis、My Note、Keywords、生成日時、関連Signalを閲覧し、編集・確認付き削除ができます。
+- Keywordは表記を正規化して完全一致で照合し、全期間のSignalとFocusを相互に辿れます。Keyword編集に応じて関連も変わります。
+- LLM API、共有からの自動登録、TODO管理は導入しません。Driveとは同期しません。
+- 旧ナレッジ機能と旧データは廃止します。
 
 ## 5. 画面構成
 
 - Incoming Intelligenceを通常起動画面にします。
-- Incoming IntelligenceとKnowledge Archiveは下部ナビゲーションで切り替えます。
+- Incoming IntelligenceとPersonal Intelligenceは下部ナビゲーションで切り替えます。
 - 共通ヘッダーからSettingsを開けるようにします。
 - SettingsではGoogleアカウント、Driveフォルダ、サウンド、触覚、演出軽減を設定します。
 - Incoming Intelligenceの概要メモ編集画面は専用の遷移先とします。
@@ -129,8 +126,8 @@ ORIONへのアクセスは、アプリ起動時の端末認証で保護します
 - 共通ヘッダー、下部ナビゲーション、Navigation ComposeによるSettingsを含む画面遷移を実装済みです。
 - 通常起動時はIncoming Intelligenceを選択し、画面を再生成しても選択中のタブを維持します。
 - Incoming Intelligenceでは、`drive.metadata.readonly`によるGoogle Drive認可、GoogleドキュメントとWord文書（`.docx`）の手動同期、サブフォルダ走査、Roomキャッシュ、外部アプリでの文書表示と、Drive未設定、一覧、対象なし、同期中、オフライン、同期エラーの画面状態を実装済みです。
-- Knowledge Archiveでは、Roomを使用した一覧、追加、編集、削除と外部アプリでのURL表示を実装済みです。
-- Knowledge Archiveの追加・編集画面では下部ナビゲーションを隠し、共通ヘッダーのRETURN操作とシステムの戻る操作で同じ破棄確認を行います。
+- Personal IntelligenceではSignalとFocus、分析用プロンプト、分析下書きをRoomへ保存し、Keywordから相互の関連を表示します。
+- Personal Intelligenceの詳細・編集・分析画面では下部ナビゲーションを隠します。通常編集はRETURNとシステムバックで未保存変更を確認し、分析画面は下書きを保存して戻ります。
 - Settingsでは、`drive.metadata.readonly`による認可、ORION内のフォルダ階層表示と現在フォルダの明示的な選択、Roomへの保存、接続解除を実装済みです。Google Pickerと`drive.file`は使用しません。その他の設定項目は未実装です。
 - ApplicationスコープのRoom、Repository、Google Driveデータソースと、各画面のViewModelはDagger Hiltで生成・注入します。
 - 各主要画面と共通UIは独立してPreviewでき、画面は外部から状態と操作を受け取る構成にします。
@@ -151,5 +148,5 @@ ORIONへのアクセスは、アプリ起動時の端末認証で保護します
 
 - GoogleドキュメントとWord文書の本文取得、解析、保存、アプリ内表示
 - Incoming Intelligenceのタイトルのユーザー編集
-- Knowledge ArchiveとIncoming Intelligenceの自動関連付け
+- Personal IntelligenceとIncoming Intelligenceの自動関連付け
 - 複数ユーザー間の共有や共同編集

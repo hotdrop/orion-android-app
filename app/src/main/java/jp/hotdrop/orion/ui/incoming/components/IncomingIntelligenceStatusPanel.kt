@@ -74,7 +74,7 @@ private fun IncomingIntelligenceStatusTone.toColor(): Color = when (this) {
 private fun IncomingIntelligenceStatusPanelReceivingPreview() {
     OrionTheme {
         IncomingIntelligenceStatusPanel(
-            code = "UPLINK // RECEIVING",
+            code = "UPLINK RECEIVING",
             description = "同期中です。保存済みの信号は引き続き参照できます。",
             tone = IncomingIntelligenceStatusTone.Normal,
         )
@@ -86,7 +86,7 @@ private fun IncomingIntelligenceStatusPanelReceivingPreview() {
 private fun IncomingIntelligenceStatusPanelErrorPreview() {
     OrionTheme {
         IncomingIntelligenceStatusPanel(
-            code = "UPLINK // ERROR",
+            code = "UPLINK ERROR",
             description = "認証を確認してから再試行してください。",
             tone = IncomingIntelligenceStatusTone.Error,
         )

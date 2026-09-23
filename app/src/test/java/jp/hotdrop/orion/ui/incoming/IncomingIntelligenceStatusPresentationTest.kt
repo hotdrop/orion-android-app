@@ -14,7 +14,7 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "error",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // STANDBY", status?.code)
+        assertEquals("UPLINK STANDBY", status?.code)
         assertEquals(IncomingIntelligenceStatusTone.Warning, status?.tone)
     }
 
@@ -27,7 +27,7 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "error",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // RECEIVING", status?.code)
+        assertEquals("UPLINK RECEIVING", status?.code)
         assertEquals(IncomingIntelligenceStatusTone.Normal, status?.tone)
     }
 
@@ -39,7 +39,7 @@ class IncomingIntelligenceStatusPresentationTest {
             errorMessage = "認証エラー",
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // ERROR", status?.code)
+        assertEquals("UPLINK ERROR", status?.code)
         assertEquals("認証エラー", status?.description)
         assertEquals(IncomingIntelligenceStatusTone.Error, status?.tone)
     }
@@ -51,7 +51,7 @@ class IncomingIntelligenceStatusPresentationTest {
             isOffline = true,
         ).toStatusPresentation()
 
-        assertEquals("UPLINK // OFFLINE CACHE", status?.code)
+        assertEquals("UPLINK OFFLINE CACHE", status?.code)
         assertEquals(IncomingIntelligenceStatusTone.Warning, status?.tone)
     }
 

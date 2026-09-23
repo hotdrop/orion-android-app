@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import jp.hotdrop.orion.navigation.OrionDestination
 import jp.hotdrop.orion.navigation.OrionTopLevelDestination
 import jp.hotdrop.orion.ui.OrionAppShell
-import jp.hotdrop.orion.ui.archive.components.editor.ArchiveTitleInputTag
 import jp.hotdrop.orion.ui.settings.components.SelectDriveFolderButtonTag
 import jp.hotdrop.orion.ui.theme.OrionTheme
 import org.junit.Rule
@@ -47,23 +46,12 @@ class OrionNavigationTest {
                             modifier = modifier,
                         ) {
                             composable(OrionTopLevelDestination.Incoming.route) {
-                                Text("DRIVE TARGET // NOT CONFIGURED")
+                                Text("DRIVE TARGET NOT CONFIGURED")
                             }
                             composable(OrionTopLevelDestination.Archive.route) {
                                 Column {
                                     Text("ARCHIVE CONTENT")
-                                    Text(
-                                        text = "NEW",
-                                        modifier = Modifier
-                                            .semantics { contentDescription = "新しい記録を追加" }
-                                            .clickable {
-                                                navController.navigate(OrionDestination.ARCHIVE_NEW_ROUTE)
-                                            },
-                                    )
                                 }
-                            }
-                            composable(OrionDestination.ARCHIVE_NEW_ROUTE) {
-                                Text("TITLE", modifier = Modifier.testTag(ArchiveTitleInputTag))
                             }
                             composable(OrionDestination.SETTINGS_ROUTE) {
                                 Text(
@@ -80,25 +68,15 @@ class OrionNavigationTest {
         composeRule
             .onNodeWithContentDescription("現在の画面: INCOMING INTELLIGENCE")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("DRIVE TARGET // NOT CONFIGURED").assertIsDisplayed()
+        composeRule.onNodeWithText("DRIVE TARGET NOT CONFIGURED").assertIsDisplayed()
 
         composeRule
-            .onNodeWithContentDescription("KNOWLEDGE ARCHIVEを開く")
+            .onNodeWithContentDescription("PERSONAL INTELLIGENCEを開く")
             .performClick()
             .assertIsSelected()
         composeRule
-            .onNodeWithContentDescription("現在の画面: KNOWLEDGE ARCHIVE")
+            .onNodeWithContentDescription("現在の画面: PERSONAL INTELLIGENCE")
             .assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("新しい記録を追加").performClick()
-        composeRule
-            .onNodeWithContentDescription("現在の画面: NEW KNOWLEDGE RECORD")
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(ArchiveTitleInputTag).assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("前の画面へ戻る").performClick()
-        composeRule
-            .onNodeWithContentDescription("現在の画面: KNOWLEDGE ARCHIVE")
-            .assertIsDisplayed()
-
         composeRule.onNodeWithContentDescription("Settingsを開く").performClick()
         composeRule
             .onNodeWithContentDescription("現在の画面: SYSTEM SETTINGS")
@@ -107,10 +85,10 @@ class OrionNavigationTest {
 
         composeRule.onNodeWithContentDescription("前の画面へ戻る").performClick()
         composeRule
-            .onNodeWithContentDescription("現在の画面: KNOWLEDGE ARCHIVE")
+            .onNodeWithContentDescription("現在の画面: PERSONAL INTELLIGENCE")
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("KNOWLEDGE ARCHIVEを開く")
+            .onNodeWithContentDescription("PERSONAL INTELLIGENCEを開く")
             .assertIsSelected()
     }
 }

@@ -37,7 +37,7 @@ fun IncomingIntelligenceDriveNotConfigured(
     modifier: Modifier = Modifier,
 ) {
     IncomingIntelligenceEmptyPanel(
-        code = "DRIVE TARGET // NOT CONFIGURED",
+        code = "DRIVE TARGET NOT CONFIGURED",
         message = "SettingsでGoogle Driveの対象フォルダを設定してください。",
         toneColor = OrionAmber,
         modifier = modifier,
@@ -53,7 +53,7 @@ fun IncomingIntelligenceDriveNotConfigured(
 @Composable
 fun IncomingIntelligenceInitialSync(modifier: Modifier = Modifier) {
     IncomingIntelligenceEmptyPanel(
-        code = "SIGNAL SCAN // IN PROGRESS",
+        code = "SIGNAL SCAN IN PROGRESS",
         message = "Google Driveから技術情報を取得しています。",
         toneColor = OrionCyan,
         modifier = modifier,
@@ -148,19 +148,29 @@ private val IncomingEmptyActionShape = CutCornerShape(topStart = 8.dp, bottomEnd
 @Preview
 @Composable
 private fun IncomingIntelligenceDriveNotConfiguredPreview() {
-    OrionTheme { IncomingIntelligenceDriveNotConfigured(onOpenSettings = {}) }
+    OrionTheme {
+        IncomingIntelligenceDriveNotConfigured(
+            onOpenSettings = {}
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun IncomingIntelligenceInitialSyncPreview() {
-    OrionTheme { IncomingIntelligenceInitialSync() }
+    OrionTheme {
+        IncomingIntelligenceInitialSync()
+    }
 }
 
 @Preview
 @Composable
 private fun IncomingIntelligenceNoDocumentsPreview() {
-    OrionTheme { IncomingIntelligenceNoDocuments(onSync = {}) }
+    OrionTheme {
+        IncomingIntelligenceNoDocuments(
+            onSync = {}
+        )
+    }
 }
 
 @Preview
@@ -168,7 +178,7 @@ private fun IncomingIntelligenceNoDocumentsPreview() {
 private fun IncomingIntelligenceEmptyPanelPreview() {
     OrionTheme {
         IncomingIntelligenceEmptyPanel(
-            code = "EMPTY STATE // PREVIEW",
+            code = "EMPTY STATE PREVIEW",
             message = "代表的な空状態の表示です。",
             toneColor = OrionAmber,
         ) {

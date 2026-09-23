@@ -1,6 +1,5 @@
 package jp.hotdrop.orion.navigation
 
-import jp.hotdrop.orion.ui.incoming.IncomingMemoRoute
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -9,11 +8,17 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import jp.hotdrop.orion.ui.archive.KnowledgeArchiveEditorRoute
-import jp.hotdrop.orion.ui.archive.KnowledgeArchiveRoute
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceRoute
+import jp.hotdrop.orion.ui.incoming.IncomingMemoRoute
+import jp.hotdrop.orion.ui.intelligence.AnalysisRoute
+import jp.hotdrop.orion.ui.intelligence.ArchiveRoute
+import jp.hotdrop.orion.ui.intelligence.RecordDetailRoute
+import jp.hotdrop.orion.ui.intelligence.RecordEditorRoute
 import jp.hotdrop.orion.ui.settings.SettingsRoute
 
+/**
+ * トップレベル画面と記録の詳細・編集・分析の遷移を定義する。
+ */
 @Composable
 fun OrionNavHost(
     navController: NavHostController,
@@ -43,31 +48,63 @@ fun OrionNavHost(
             IncomingMemoRoute(onClose = { navController.popBackStack() })
         }
         composable(OrionTopLevelDestination.Archive.route) {
-            KnowledgeArchiveRoute(
-                onCreateEntry = { navController.navigate(OrionDestination.ARCHIVE_NEW_ROUTE) },
-                onEditEntry = { entryId ->
-                    navController.navigate(OrionDestination.archiveEditRoute(entryId))
+            ArchiveRoute(
+                onNewSignal = { navController.navigate(OrionDestination.recordEditRoute("signal", 0)) },
+                onAnalysis = {
+                    navController.navigate(OrionDestination.ANALYSIS_ROUTE) {
+                        launchSingleTop = true
+                    }
                 },
-                modifier = Modifier,
-            )
-        }
-        composable(OrionDestination.ARCHIVE_NEW_ROUTE) {
-            KnowledgeArchiveEditorRoute(
-                onClose = navController::popBackStack,
-                modifier = Modifier,
+                onSignal = { navController.navigate(OrionDestination.recordDetailRoute("signal", it)) },
+                onFocus = { navController.navigate(OrionDestination.recordDetailRoute("focus", it)) },
             )
         }
         composable(
-            route = OrionDestination.ARCHIVE_EDIT_ROUTE,
+            route = OrionDestination.RECORD_DETAIL_ROUTE,
             arguments = listOf(
-                navArgument(OrionDestination.ARCHIVE_ENTRY_ID_ARGUMENT) {
-                    type = NavType.LongType
-                },
+                navArgument("kind") { type = NavType.StringType },
+                navArgument("recordId") { type = NavType.LongType },
             ),
-        ) {
-            KnowledgeArchiveEditorRoute(
-                onClose = navController::popBackStack,
-                modifier = Modifier,
+        ) { entry ->
+            val kind = entry.arguments?.getString("kind") ?: "signal"
+            val id = entry.arguments?.getLong("recordId") ?: 0
+            RecordDetailRoute(
+                focus = kind == "focus",
+                id = id,
+                onEdit = { navController.navigate(OrionDestination.recordEditRoute(kind, id)) },
+                onSignal = { recordId ->
+                    navController.navigate(OrionDestination.recordDetailRoute("signal", recordId)) {
+                        launchSingleTop = true
+                    }
+                },
+                onFocus = { recordId ->
+                    navController.navigate(OrionDestination.recordDetailRoute("focus", recordId)) {
+                        launchSingleTop = true
+                    }
+                },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = OrionDestination.RECORD_EDIT_ROUTE,
+            arguments = listOf(
+                navArgument("kind") { type = NavType.StringType },
+                navArgument("recordId") { type = NavType.LongType },
+            ),
+        ) { entry ->
+            RecordEditorRoute(
+                canDelete = (entry.arguments?.getLong("recordId") ?: 0) > 0,
+                onClose = { navController.popBackStack() },
+            )
+        }
+        composable(OrionDestination.ANALYSIS_ROUTE) {
+            AnalysisRoute(
+                onClose = { focusId ->
+                    navController.popBackStack()
+                    if (focusId != null) {
+                        navController.navigate(OrionDestination.recordDetailRoute("focus", focusId))
+                    }
+                },
             )
         }
         composable(OrionDestination.SETTINGS_ROUTE) {

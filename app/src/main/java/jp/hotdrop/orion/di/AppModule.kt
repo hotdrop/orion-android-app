@@ -2,6 +2,7 @@ package jp.hotdrop.orion.di
 
 import jp.hotdrop.orion.data.local.dao.IncomingPersonalDao
 import jp.hotdrop.orion.data.local.MIGRATION_1_2
+import jp.hotdrop.orion.data.local.MIGRATION_2_3
 import android.content.Context
 import androidx.room.Room
 import dagger.Module
@@ -12,7 +13,6 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import jp.hotdrop.orion.data.local.OrionDatabase
 import jp.hotdrop.orion.data.local.dao.IncomingIntelligenceDao
-import jp.hotdrop.orion.data.local.dao.KnowledgeArchiveDao
 import jp.hotdrop.orion.data.local.dao.SettingsDao
 import jp.hotdrop.orion.data.remote.GoogleDriveRemoteDataSource
 import jp.hotdrop.orion.data.remote.HttpGoogleDriveRemoteDataSource
@@ -27,7 +27,8 @@ object AppModule {
             context,
             OrionDatabase::class.java,
             OrionDatabase.DATABASE_NAME,
-        ).addMigrations(MIGRATION_1_2).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .build()
 
     @Provides
     @Singleton
@@ -35,17 +36,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideKnowledgeArchiveDao(database: OrionDatabase): KnowledgeArchiveDao = database.knowledgeArchiveDao()
+    fun provideIncomingIntelligenceDao(database: OrionDatabase): IncomingIntelligenceDao = database.incomingIntelligenceDao()
 
     @Provides
     @Singleton
-    fun provideIncomingIntelligenceDao(database: OrionDatabase): IncomingIntelligenceDao =
-        database.incomingIntelligenceDao()
-
-    @Provides
-    @Singleton
-    fun provideIncomingPersonalDao(database: OrionDatabase): IncomingPersonalDao =
-        database.incomingPersonalDao()
+    fun provideIncomingPersonalDao(database: OrionDatabase): IncomingPersonalDao = database.incomingPersonalDao()
 
     @Provides
     @Singleton

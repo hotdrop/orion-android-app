@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.platform.app.InstrumentationRegistry
 import jp.hotdrop.orion.data.local.MIGRATION_1_2
+import jp.hotdrop.orion.data.local.MIGRATION_2_3
 import jp.hotdrop.orion.data.local.OrionDatabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -31,7 +32,8 @@ class IncomingMigrationTest {
         }
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val db = Room.databaseBuilder(context, OrionDatabase::class.java, DATABASE_NAME)
-            .addMigrations(MIGRATION_1_2).build()
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .build()
         try {
             val document = db.incomingPersonalDao().observeDocuments("root").first().single()
             assertEquals("Report", document.title)

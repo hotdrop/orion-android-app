@@ -81,7 +81,7 @@ fun IncomingIntelligenceScreen(
 
         uiState.actionErrorMessage?.let { message ->
             IncomingIntelligenceStatusPanel(
-                code = "LOCAL // ERROR", description = message, tone = IncomingIntelligenceStatusTone.Error,
+                code = "LOCAL ERROR", description = message, tone = IncomingIntelligenceStatusTone.Error,
             )
             Spacer(modifier = Modifier.height(12.dp))
         }

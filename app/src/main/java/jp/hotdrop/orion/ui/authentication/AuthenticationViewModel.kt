@@ -21,9 +21,7 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
     fun requestAuthentication(): Boolean {
         val canRequest = when (mutableUiState.value) {
             AuthenticationUiState.Booting,
-            is AuthenticationUiState.Error,
-            -> true
-
+            is AuthenticationUiState.Error -> true
             else -> false
         }
         if (canRequest) {
@@ -41,19 +39,16 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
                     ?: 0
                 AuthenticationUiState.Authenticating(failedAttempts = attempts + 1)
             }
-
             BiometricAuthenticationResult.DeviceSecurityRequired -> AuthenticationUiState.Error(
                 title = "SECURITY PROFILE REQUIRED",
                 message = "生体認証または画面ロックを端末に設定してください。",
                 recoveryAction = AuthenticationRecoveryAction.OpenSecuritySettings,
             )
-
             is BiometricAuthenticationResult.Canceled -> AuthenticationUiState.Error(
                 title = "ACCESS ABORTED",
                 message = result.message,
                 recoveryAction = AuthenticationRecoveryAction.Retry,
             )
-
             is BiometricAuthenticationResult.Unavailable -> AuthenticationUiState.Error(
                 title = "AUTHENTICATION OFFLINE",
                 message = result.message,
@@ -71,21 +66,15 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
 
 sealed interface AuthenticationUiState {
     data object Locked : AuthenticationUiState
-
     data object Booting : AuthenticationUiState
-
-    data class Authenticating(
-        val failedAttempts: Int = 0,
-    ) : AuthenticationUiState
+    data class Authenticating(val failedAttempts: Int = 0) : AuthenticationUiState
 
     data class Error(
         val title: String,
         val message: String,
         val recoveryAction: AuthenticationRecoveryAction,
     ) : AuthenticationUiState
-
     data object AccessGranted : AuthenticationUiState
-
     data object Unlocked : AuthenticationUiState
 }
 

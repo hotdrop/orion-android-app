@@ -18,25 +18,25 @@ internal enum class IncomingIntelligenceStatusTone {
 
 internal fun IncomingIntelligenceUiState.toStatusPresentation(): IncomingIntelligenceStatusPresentation? = when {
     !isDriveConfigured -> IncomingIntelligenceStatusPresentation(
-        code = "UPLINK // STANDBY",
+        code = "UPLINK STANDBY",
         description = "同期先が未設定です。",
         tone = IncomingIntelligenceStatusTone.Warning,
     )
 
     isSyncing -> IncomingIntelligenceStatusPresentation(
-        code = "UPLINK // RECEIVING",
+        code = "UPLINK RECEIVING",
         description = "同期中です。保存済みの信号は引き続き参照できます。",
         tone = IncomingIntelligenceStatusTone.Normal,
     )
 
     errorMessage != null -> IncomingIntelligenceStatusPresentation(
-        code = "UPLINK // ERROR",
+        code = "UPLINK ERROR",
         description = errorMessage,
         tone = IncomingIntelligenceStatusTone.Error,
     )
 
     isOffline -> IncomingIntelligenceStatusPresentation(
-        code = "UPLINK // OFFLINE CACHE",
+        code = "UPLINK OFFLINE CACHE",
         description = "オフラインのため、最後に取得した信号を表示しています。",
         tone = IncomingIntelligenceStatusTone.Warning,
     )
