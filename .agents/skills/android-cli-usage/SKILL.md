@@ -15,11 +15,10 @@ description: Decide whether and how to use Android CLI for ORION. Use for curren
 
 ## 結果を扱う
 
-- 公式情報やCLI出力を判断材料として使い、`README.md` とプロジェクト固有ルールを上書きしない。
 - 長いログやJSONをそのまま会話へ貼らず、判断に必要な結果、警告、次の行動だけを要約する。
 - SDKや端末の状態に依存する結果は、確認した環境とともに報告する。
 - 実行や計測が失敗した場合は、推測で成功扱いせず、失敗理由と未確認事項を明示する。
-- Androidコードやビルド設定を変更した場合は `.skills/android-quality-gates/SKILL.md` に従う。
+- Androidコードやビルド設定を変更した場合は `.agents/skills/android-quality-gates/SKILL.md` に従う。
 
 ## 基本確認
 

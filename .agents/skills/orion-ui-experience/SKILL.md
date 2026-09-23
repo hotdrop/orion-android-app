@@ -7,7 +7,6 @@ description: Design or modify ORION's Jetpack Compose UI, theme, custom componen
 
 ## 世界観を機能へ結び付ける
 
-- `README.md` の「近未来のAI研究施設」をデザイン判断の正本にする。
 - Cyberpunk、Sci-Fi、Tactical UI、Hologram、HUD、Terminal、Intelligence、Mission Controlを一貫した視覚言語として扱う。
 - 装飾を状態、階層、進行、警告、操作結果の表現へ結び付ける。意味を持たない演出を増やす場合も、情報の読解や操作を妨げない。
 - Material 3は土台や相互運用に必要な範囲で使い、既定コンポーネントの見た目にORIONを従属させない。
@@ -43,4 +42,4 @@ description: Design or modify ORION's Jetpack Compose UI, theme, custom componen
 - 新規作成または大きく変更する再利用可能なComposableと主要画面にPreviewを用意し、代表状態を個別に表示する。小さな変更では既存Previewを利用し、Preview新設だけを目的にスコープを広げない。
 - 通常、空、読み込み、エラー、長文、ユーザー編集済みなど変更に関係する状態を確認する。
 - 動きや描画性能を変更した場合はPreviewだけで完了せず、利用可能な実行環境で遷移、連打、スクロール、復帰を確認する。環境がない場合は未確認のリスクとして報告する。
-- `.skills/android-quality-gates/SKILL.md` から変更リスクに合う検証を選ぶ。
+- `.agents/skills/android-quality-gates/SKILL.md` から変更リスクに合う検証を選ぶ。

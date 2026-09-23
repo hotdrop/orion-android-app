@@ -7,8 +7,6 @@ description: Design or modify ORION's Android architecture, Activity and Composa
 
 ## 現状を確認する
 
-- `README.md`、対象コード、`gradle/libs.versions.toml`、モジュール構成を先に読む。
-- READMEのTech Stackは方向性として扱い、依存関係に存在しないRoom、Navigation、DIなどを導入済みとみなさない。
 - 仕様がREADMEにない場合は、実装で仕様を創作せず、必要な判断をユーザーへ確認する。
 
 ## 基本原則
@@ -48,13 +46,13 @@ description: Design or modify ORION's Android architecture, Activity and Composa
 - コンストラクタ注入と明示的な生成で十分な間は、DIフレームワークを追加しない。
 - Hiltなどは依存グラフ、スコープ、差し替えの複雑さを実際に軽減できる段階で導入する。
 - 新規ライブラリは、既存APIで解決できない理由、保守性、サイズ、性能、テスト容易性を確認してから追加する。
-- アーキテクチャ変更後は `.skills/android-quality-gates/SKILL.md` に従って検証する。
+- アーキテクチャ変更後は `.agents/skills/android-quality-gates/SKILL.md` に従って検証する。
 
 ## 完了条件
 
 - UI、状態管理、永続化、外部連携の所有境界を説明できる。
 - Activityや単一Composableへ異なる責務が集中していないことを差分で確認している。
-- 新規画面では、`.skills/orion-ui-experience/SKILL.md` のPreview要件と `.skills/android-quality-gates/SKILL.md` の主要導線テスト要件を満たしている。
+- 新規画面では、`.agents/skills/orion-ui-experience/SKILL.md` のPreview要件と `.agents/skills/android-quality-gates/SKILL.md` の主要導線テスト要件を満たしている。
 - ローカルデータの正本と同期時のユーザー編集値の扱いが明確である。
 - 不要なレイヤー、interface、モジュール、依存関係を増やしていない。
 - エラーのユーザー表示、再試行、内部診断を混同していない。
