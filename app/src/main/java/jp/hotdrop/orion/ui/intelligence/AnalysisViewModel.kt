@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * 分析下書きと、読み込み・自動保存・終了操作の表示状態。
@@ -67,7 +69,7 @@ class AnalysisViewModel @Inject constructor(
             try {
                 val draft = repository.beginAnalysis()
                 mutableState.update { it.copy(draft = draft, loading = false) }
-                refreshCandidates(delayMillis = 0)
+                refreshCandidates()
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -101,7 +103,8 @@ class AnalysisViewModel @Inject constructor(
             )
         }
         if (bodyChanged) {
-            refreshCandidates(delayMillis = 350)
+            // 入力が落ち着いてから抽出
+            refreshCandidates(wait = 350.milliseconds)
         }
         persist()
     }
@@ -160,17 +163,17 @@ class AnalysisViewModel @Inject constructor(
      * 入力待ち時間を設けずにKeyword候補を再取得する。
      */
     fun suggest() {
-        refreshCandidates(delayMillis = 0)
+        refreshCandidates()
     }
 
     /**
      * 先行する候補取得を取り消し、最新の分析本文から候補を抽出する。
      */
-    private fun refreshCandidates(delayMillis: Long) {
+    private fun refreshCandidates(wait: Duration = Duration.ZERO) {
         candidateJob?.cancel()
         candidateJob = viewModelScope.launch {
-            // TODO これは？delayは必要なのか？
-            delay(delayMillis)
+            // 連続入力中のDB取得・候補抽出を抑える
+            delay(wait)
             try {
                 val known = repository.knownKeywords()
                 mutableState.update {
