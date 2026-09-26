@@ -1,5 +1,7 @@
 package jp.hotdrop.orion.ui.incoming
 
+import jp.hotdrop.orion.ui.incoming.intelligence.IncomingIntelligenceStatusTone
+import jp.hotdrop.orion.ui.incoming.intelligence.toStatusPresentation
 import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceUiState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

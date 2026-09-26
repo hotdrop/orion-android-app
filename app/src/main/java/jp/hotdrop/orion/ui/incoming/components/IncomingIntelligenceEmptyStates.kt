@@ -92,8 +92,15 @@ private fun IncomingIntelligenceEmptyPanel(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .border(1.dp, toneColor.copy(alpha = 0.65f), IncomingEmptyStateShape)
-            .background(OrionPanelElevated.copy(alpha = 0.35f), IncomingEmptyStateShape)
+            .border(
+                1.dp,
+                toneColor.copy(alpha = 0.65f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
+            .background(
+                OrionPanelElevated.copy(alpha = 0.35f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -126,7 +133,11 @@ private fun IncomingIntelligenceOutlineAction(
     Box(
         modifier = modifier
             .heightIn(min = 48.dp)
-            .border(1.dp, OrionCyan, IncomingEmptyActionShape)
+            .border(
+                1.dp,
+                OrionCyan,
+                CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
+            )
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = accessibilityLabel }
             .padding(horizontal = 18.dp),
@@ -141,9 +152,6 @@ private fun IncomingIntelligenceOutlineAction(
         )
     }
 }
-
-private val IncomingEmptyStateShape = CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
-private val IncomingEmptyActionShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
 
 @Preview
 @Composable

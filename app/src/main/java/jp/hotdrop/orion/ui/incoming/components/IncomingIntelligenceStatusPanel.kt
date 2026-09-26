@@ -12,14 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceStatusTone
+import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceStatusToneEnum
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionError
@@ -31,10 +30,14 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 internal fun IncomingIntelligenceStatusPanel(
     code: String,
     description: String,
-    tone: IncomingIntelligenceStatusTone,
+    tone: IncomingIntelligenceStatusToneEnum,
     modifier: Modifier = Modifier,
 ) {
-    val statusColor = tone.toColor()
+    val statusColor =  when (tone) {
+        IncomingIntelligenceStatusToneEnum.Normal -> OrionCyan
+        IncomingIntelligenceStatusToneEnum.Warning -> OrionAmber
+        IncomingIntelligenceStatusToneEnum.Error -> OrionError
+    }
 
     Row(
         modifier = modifier
@@ -63,12 +66,6 @@ internal fun IncomingIntelligenceStatusPanel(
     }
 }
 
-private fun IncomingIntelligenceStatusTone.toColor(): Color = when (this) {
-    IncomingIntelligenceStatusTone.Normal -> OrionCyan
-    IncomingIntelligenceStatusTone.Warning -> OrionAmber
-    IncomingIntelligenceStatusTone.Error -> OrionError
-}
-
 @Preview
 @Composable
 private fun IncomingIntelligenceStatusPanelReceivingPreview() {
@@ -76,7 +73,7 @@ private fun IncomingIntelligenceStatusPanelReceivingPreview() {
         IncomingIntelligenceStatusPanel(
             code = "UPLINK RECEIVING",
             description = "同期中です。保存済みの信号は引き続き参照できます。",
-            tone = IncomingIntelligenceStatusTone.Normal,
+            tone = IncomingIntelligenceStatusToneEnum.Normal,
         )
     }
 }
@@ -88,7 +85,7 @@ private fun IncomingIntelligenceStatusPanelErrorPreview() {
         IncomingIntelligenceStatusPanel(
             code = "UPLINK ERROR",
             description = "認証を確認してから再試行してください。",
-            tone = IncomingIntelligenceStatusTone.Error,
+            tone = IncomingIntelligenceStatusToneEnum.Error,
         )
     }
 }

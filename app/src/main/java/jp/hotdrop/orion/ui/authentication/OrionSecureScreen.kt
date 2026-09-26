@@ -60,7 +60,7 @@ import jp.hotdrop.orion.ui.theme.OrionTheme
 import kotlin.math.min
 
 @Composable
-fun OrionSecureRoot(
+fun OrionSecureScreen(
     uiState: AuthenticationUiState,
     onAuthenticationRequested: () -> Unit,
     onUnlockAnimationFinished: () -> Unit,
@@ -97,7 +97,7 @@ fun OrionSecureRoot(
 }
 
 @Composable
-internal fun AuthenticationGate(
+private fun AuthenticationGate(
     uiState: AuthenticationUiState,
     onAuthenticationRequested: () -> Unit,
     onUnlockAnimationFinished: () -> Unit,

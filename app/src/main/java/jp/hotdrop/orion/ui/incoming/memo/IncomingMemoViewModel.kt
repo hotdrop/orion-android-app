@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.incoming
+package jp.hotdrop.orion.ui.incoming.memo
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import jp.hotdrop.orion.data.IncomingPersonalRepository
 import jp.hotdrop.orion.navigation.OrionDestination
+import jp.hotdrop.orion.ui.incoming.memo.uistate.IncomingMemoUiState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,16 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.logging.Level
 import java.util.logging.Logger
-
-data class IncomingMemoUiState(
-    val title: String = "",
-    val memo: String = "",
-    val isLoading: Boolean = true,
-    val isSaving: Boolean = false,
-    val canSave: Boolean = false,
-    val showDiscard: Boolean = false,
-    val error: String? = null,
-)
 
 @HiltViewModel
 class IncomingMemoViewModel @Inject constructor(
@@ -39,7 +30,9 @@ class IncomingMemoViewModel @Inject constructor(
     private val closeEvents = Channel<Unit>(Channel.BUFFERED)
     val events = closeEvents.receiveAsFlow()
 
-    init { load() }
+    init {
+        load()
+    }
 
     fun load() {
         state.update { it.copy(isLoading = true, error = null) }
@@ -51,13 +44,19 @@ class IncomingMemoViewModel @Inject constructor(
                 } else {
                     originalMemo = savedStateHandle["originalMemo"] ?: document.memo
                     savedStateHandle["originalMemo"] = originalMemo
-                    state.update { it.copy(title = document.title, memo = savedStateHandle["memo"] ?: document.memo,
-                        isLoading = false, canSave = true) }
+                    state.update {
+                        it.copy(
+                            title = document.title,
+                            memo = savedStateHandle["memo"] ?: document.memo,
+                            isLoading = false,
+                            canSave = true
+                        )
+                    }
                 }
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                reportFailure("メモを読み込めませんでした。再試行してください。", error)
+                reportFailure("メモを読み込めませんでした。再試行してください。error:${error.message}")
                 state.update { it.copy(isLoading = false) }
             }
         }
@@ -80,7 +79,7 @@ class IncomingMemoViewModel @Inject constructor(
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                reportFailure("メモを保存できませんでした。再試行してください。", error)
+                reportFailure("メモを保存できませんでした。再試行してください。error:${error.message}")
             } finally {
                 state.update { it.copy(isSaving = false) }
             }
@@ -93,11 +92,15 @@ class IncomingMemoViewModel @Inject constructor(
         else close()
     }
 
-    fun dismissDiscard() { state.update { it.copy(showDiscard = false) } }
-    fun close() { viewModelScope.launch { closeEvents.send(Unit) } }
+    fun dismissDiscard() {
+        state.update { it.copy(showDiscard = false) }
+    }
 
-    private fun reportFailure(message: String, error: Exception) {
-        Logger.getLogger(IncomingMemoViewModel::class.java.name).log(Level.WARNING, message, error)
+    fun close() {
+        viewModelScope.launch { closeEvents.send(Unit) }
+    }
+
+    private fun reportFailure(message: String) {
         state.update { it.copy(error = message) }
     }
 }

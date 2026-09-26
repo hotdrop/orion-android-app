@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import jp.hotdrop.orion.ui.incoming.IncomingIntelligenceRoute
-import jp.hotdrop.orion.ui.incoming.IncomingMemoRoute
+import jp.hotdrop.orion.ui.incoming.memo.IncomingMemoRoute
 import jp.hotdrop.orion.ui.intelligence.analysis.AnalysisRoute
 import jp.hotdrop.orion.ui.intelligence.ArchiveRoute
 import jp.hotdrop.orion.ui.intelligence.RecordDetailRoute

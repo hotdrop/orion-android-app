@@ -16,17 +16,27 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import jp.hotdrop.orion.model.IncomingIntelligenceDocument
-import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceDocumentList
+import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceDocumentCard
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceDriveNotConfigured
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceHeader
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceInitialSync
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceNoDocuments
 import jp.hotdrop.orion.ui.incoming.components.IncomingIntelligenceStatusPanel
+import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceStatusToneEnum
 import jp.hotdrop.orion.ui.incoming.uistate.IncomingIntelligenceUiState
 import jp.hotdrop.orion.ui.theme.OrionDeepNavy
 import jp.hotdrop.orion.ui.theme.OrionCyan
@@ -48,8 +58,13 @@ fun IncomingIntelligenceScreen(
     onDismissDelete: () -> Unit = {},
     onConfirmDelete: () -> Unit = {},
 ) {
-    val status = uiState.toStatusPresentation()
-    val visibleDocuments = if (uiState.favoritesOnly) uiState.documents.filter { it.isFavorite } else uiState.documents
+    val status = uiState.toStatusUiState()
+    val visibleDocuments = if (uiState.favoritesOnly) {
+        uiState.documents.filter { it.isFavorite }
+    } else {
+        uiState.documents
+    }
+
     uiState.pendingDelete?.let { document ->
         AlertDialog(
             onDismissRequest = onDismissDelete,
@@ -60,8 +75,22 @@ fun IncomingIntelligenceScreen(
                     uiState.actionErrorMessage?.let { Text(it) }
                 }
             },
-            confirmButton = { TextButton(onClick = onConfirmDelete, enabled = !uiState.isDeleting) { Text("削除") } },
-            dismissButton = { TextButton(onClick = onDismissDelete, enabled = !uiState.isDeleting) { Text("キャンセル") } },
+            confirmButton = {
+                TextButton(
+                    onClick = onConfirmDelete,
+                    enabled = !uiState.isDeleting
+                ) {
+                    Text("削除")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismissDelete,
+                    enabled = !uiState.isDeleting
+                ) {
+                    Text("キャンセル")
+                }
+            },
         )
     }
 
@@ -81,7 +110,9 @@ fun IncomingIntelligenceScreen(
 
         uiState.actionErrorMessage?.let { message ->
             IncomingIntelligenceStatusPanel(
-                code = "LOCAL ERROR", description = message, tone = IncomingIntelligenceStatusTone.Error,
+                code = "LOCAL ERROR",
+                description = message,
+                tone = IncomingIntelligenceStatusToneEnum.Error
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -101,14 +132,19 @@ fun IncomingIntelligenceScreen(
             selectedLabelColor = OrionCyan,
         )
         val filterShape = CutCornerShape(topStart = 6.dp, bottomEnd = 6.dp)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             FilterChip(
                 selected = !uiState.favoritesOnly,
                 onClick = { onFavoritesOnlyChanged(false) },
                 label = { Text("ALL") },
                 colors = filterColors,
                 shape = filterShape,
-                border = BorderStroke(1.dp, if (!uiState.favoritesOnly) OrionCyan else OrionCyanMuted),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (!uiState.favoritesOnly) OrionCyan else OrionCyanMuted
+                ),
             )
             FilterChip(
                 selected = uiState.favoritesOnly,
@@ -116,15 +152,15 @@ fun IncomingIntelligenceScreen(
                 label = { Text("MARK") },
                 colors = filterColors,
                 shape = filterShape,
-                border = BorderStroke(1.dp, if (uiState.favoritesOnly) OrionCyan else OrionCyanMuted),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (uiState.favoritesOnly) OrionCyan else OrionCyanMuted
+                ),
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
         when {
-            !uiState.isDriveConfigured && uiState.documents.isEmpty() -> IncomingIntelligenceDriveNotConfigured(
-                onOpenSettings = onOpenSettings,
-            )
-
+            !uiState.isDriveConfigured && uiState.documents.isEmpty() -> IncomingIntelligenceDriveNotConfigured(onOpenSettings = onOpenSettings)
             uiState.favoritesOnly && visibleDocuments.isEmpty() -> Text("Not MARK documents", color = OrionTextMuted)
             uiState.documents.isEmpty() && uiState.isSyncing -> IncomingIntelligenceInitialSync()
             uiState.documents.isEmpty() -> IncomingIntelligenceNoDocuments(onSync = onSync)
@@ -136,6 +172,151 @@ fun IncomingIntelligenceScreen(
                 onOpenDocument = onOpenDocument,
             )
         }
+    }
+}
+
+@Composable
+private fun IncomingIntelligenceDocumentList(
+    documents: List<IncomingIntelligenceDocument>,
+    onOpenDocument: (IncomingIntelligenceDocument) -> Unit,
+    modifier: Modifier = Modifier,
+    onToggleFavorite: (String) -> Unit = {},
+    onEditMemo: (String) -> Unit = {},
+    onRequestDelete: (IncomingIntelligenceDocument) -> Unit = {},
+) {
+    val listState = rememberLazyListState()
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    LazyColumn(
+        state = listState,
+        modifier = modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(
+            items = documents,
+            key = IncomingIntelligenceDocument::id,
+        ) { document ->
+            val isVisible by remember(listState, document.id) {
+                derivedStateOf {
+                    listState.layoutInfo.visibleItemsInfo.any { it.key == document.id }
+                }
+            }
+            IncomingIntelligenceDocumentCard(
+                playbackEnabled = isVisible && lifecycleState.isAtLeast(Lifecycle.State.RESUMED),
+                title = document.title,
+                updatedAtLabel = document.updatedAtLabel,
+                isFavorite = document.isFavorite,
+                memo = document.memo,
+                isSyncTarget = document.isSyncTarget,
+                onToggleFavorite = { onToggleFavorite(document.id) },
+                onEditMemo = { onEditMemo(document.id) },
+                onDelete = { onRequestDelete(document) },
+                isNew = document.isNew,
+                onClick = { onOpenDocument(document) },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligenceNotConfiguredPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligencePopulatedPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                lastSyncedAtLabel = "08/01 09:45",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligenceFavoritesOnlyPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                favoritesOnly = true,
+                lastSyncedAtLabel = "08/01 09:45",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligenceOfflinePreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                isOffline = true,
+                lastSyncedAtLabel = "07/31 23:10",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligenceSyncingPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                isSyncing = true,
+                lastSyncedAtLabel = "08/01 09:45",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun IncomingIntelligenceErrorPreview() {
+    OrionTheme {
+        IncomingIntelligenceScreen(
+            uiState = IncomingIntelligenceUiState(
+                isDriveConfigured = true,
+                documents = PreviewDocuments,
+                errorMessage = "認証を確認してから再試行してください。",
+                lastSyncedAtLabel = "07/31 23:10",
+            ),
+            onSync = {},
+            onOpenSettings = {},
+            onOpenDocument = {},
+        )
     }
 }
 
@@ -160,106 +341,3 @@ private val PreviewDocuments = listOf(
         isSyncTarget = false,
     ),
 )
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun IncomingIntelligenceNotConfiguredPreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Preview(showBackground = true, widthDp = 393, heightDp = 852, fontScale = 1.6f)
-@Composable
-private fun IncomingIntelligencePopulatedPreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(
-                isDriveConfigured = true,
-                documents = PreviewDocuments,
-                lastSyncedAtLabel = "08/01 09:45",
-            ),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun IncomingIntelligenceFavoritesOnlyPreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(
-                isDriveConfigured = true,
-                documents = PreviewDocuments,
-                favoritesOnly = true,
-                lastSyncedAtLabel = "08/01 09:45",
-            ),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun IncomingIntelligenceOfflinePreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(
-                isDriveConfigured = true,
-                documents = PreviewDocuments,
-                isOffline = true,
-                lastSyncedAtLabel = "07/31 23:10",
-            ),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun IncomingIntelligenceSyncingPreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(
-                isDriveConfigured = true,
-                documents = PreviewDocuments,
-                isSyncing = true,
-                lastSyncedAtLabel = "08/01 09:45",
-            ),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF030812, widthDp = 393, heightDp = 620)
-@Composable
-private fun IncomingIntelligenceErrorPreview() {
-    OrionTheme {
-        IncomingIntelligenceScreen(
-            uiState = IncomingIntelligenceUiState(
-                isDriveConfigured = true,
-                documents = PreviewDocuments,
-                errorMessage = "認証を確認してから再試行してください。",
-                lastSyncedAtLabel = "07/31 23:10",
-            ),
-            onSync = {},
-            onOpenSettings = {},
-            onOpenDocument = {},
-        )
-    }
-}

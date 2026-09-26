@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.incoming
+package jp.hotdrop.orion.ui.incoming.memo
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
@@ -17,6 +17,7 @@ fun IncomingMemoRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel) { viewModel.events.collect { onClose() } }
     BackHandler(onBack = viewModel::requestBack)
+
     IncomingMemoScreen(
         state = state, onMemoChanged = viewModel::changeMemo, onSave = viewModel::save,
         onRetry = viewModel::load, onDismissDiscard = viewModel::dismissDiscard,

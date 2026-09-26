@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.incoming
+package jp.hotdrop.orion.ui.incoming.memo
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import jp.hotdrop.orion.ui.incoming.memo.uistate.IncomingMemoUiState
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import jp.hotdrop.orion.ui.theme.OrionDeepNavy
@@ -46,7 +47,11 @@ fun IncomingMemoScreen(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("PERSONAL NOTE", color = OrionCyan, style = MaterialTheme.typography.labelLarge)
+        Text(
+            text = "PERSONAL NOTE",
+            color = OrionCyan,
+            style = MaterialTheme.typography.labelLarge
+        )
         if (state.isLoading) {
             CircularProgressIndicator(color = OrionCyan)
         } else {
@@ -70,11 +75,20 @@ fun IncomingMemoScreen(
                     border = BorderStroke(1.dp, if (state.isSaving) OrionCyanMuted else OrionCyan),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (state.isSaving) "SAVING…" else "SAVE", color = OrionCyan)
+                    Text(
+                        text = if (state.isSaving) "SAVING…" else "SAVE",
+                        color = OrionCyan
+                    )
                 }
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            if (!state.canSave) TextButton(onClick = onRetry) { Text("RETRY") }
+            if (!state.canSave) {
+                TextButton(
+                    onClick = onRetry
+                ) {
+                    Text("RETRY")
+                }
+            }
         }
     }
     if (state.showDiscard) {
@@ -82,8 +96,20 @@ fun IncomingMemoScreen(
             onDismissRequest = onDismissDiscard,
             title = { Text("変更を破棄しますか？") },
             text = { Text("未保存の概要メモは失われます。") },
-            confirmButton = { TextButton(onClick = onConfirmDiscard) { Text("破棄して戻る") } },
-            dismissButton = { TextButton(onClick = onDismissDiscard) { Text("編集を続ける") } },
+            confirmButton = {
+                TextButton(
+                    onClick = onConfirmDiscard
+                ) {
+                    Text("破棄して戻る")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismissDiscard
+                ) {
+                    Text("編集を続ける")
+                }
+            },
         )
     }
 }
@@ -93,8 +119,17 @@ fun IncomingMemoScreen(
 private fun IncomingMemoPreview() {
     OrionTheme {
         IncomingMemoScreen(
-            state = IncomingMemoUiState(title = "Jetpack Composeのパフォーマンス調査", memo = "再コンポーズの測定方法と改善の手順。\n次の実装時に参照する。", isLoading = false, canSave = true),
-            onMemoChanged = {}, onSave = {}, onRetry = {}, onDismissDiscard = {}, onConfirmDiscard = {},
+            state = IncomingMemoUiState(
+                title = "Jetpack Composeのパフォーマンス調査",
+                memo = "再コンポーズの測定方法と改善の手順。\n次の実装時に参照する。",
+                isLoading = false,
+                canSave = true
+            ),
+            onMemoChanged = {},
+            onSave = {},
+            onRetry = {},
+            onDismissDiscard = {},
+            onConfirmDiscard = {},
         )
     }
 }
@@ -104,8 +139,18 @@ private fun IncomingMemoPreview() {
 private fun IncomingMemoSavingPreview() {
     OrionTheme {
         IncomingMemoScreen(
-            state = IncomingMemoUiState(title = "Jetpack Composeのパフォーマンス調査", memo = "調査結果を保存中。", isLoading = false, canSave = true, isSaving = true),
-            onMemoChanged = {}, onSave = {}, onRetry = {}, onDismissDiscard = {}, onConfirmDiscard = {},
+            state = IncomingMemoUiState(
+                title = "Jetpack Composeのパフォーマンス調査",
+                memo = "調査結果を保存中。",
+                isLoading = false,
+                canSave = true,
+                isSaving = true
+            ),
+            onMemoChanged = {},
+            onSave = {},
+            onRetry = {},
+            onDismissDiscard = {},
+            onConfirmDiscard = {},
         )
     }
 }
