@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -47,6 +46,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.hotdrop.orion.ui.authentication.uistate.AuthenticationRecoveryAction
+import jp.hotdrop.orion.ui.authentication.uistate.AuthenticationUiState
 import jp.hotdrop.orion.ui.theme.OrionAmber
 import jp.hotdrop.orion.ui.theme.OrionCyan
 import jp.hotdrop.orion.ui.theme.OrionCyanMuted
@@ -57,9 +58,6 @@ import jp.hotdrop.orion.ui.theme.OrionText
 import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import jp.hotdrop.orion.ui.theme.OrionTheme
 import kotlin.math.min
-
-const val AUTHENTICATION_GATE_TAG = "authentication_gate"
-const val AUTHENTICATION_PRIMARY_ACTION_TAG = "authentication_primary_action"
 
 @Composable
 fun OrionSecureRoot(
@@ -117,7 +115,7 @@ internal fun AuthenticationGate(
                 phase.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
-                        durationMillis = BOOT_DURATION_MILLIS,
+                        durationMillis = 450,
                         easing = FastOutSlowInEasing,
                     ),
                 )
@@ -128,7 +126,7 @@ internal fun AuthenticationGate(
                 phase.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
-                        durationMillis = UNLOCK_DURATION_MILLIS,
+                        durationMillis = 900,
                         easing = FastOutSlowInEasing,
                     ),
                 )
@@ -144,7 +142,6 @@ internal fun AuthenticationGate(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .testTag(AUTHENTICATION_GATE_TAG)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
@@ -156,7 +153,14 @@ internal fun AuthenticationGate(
             )
             .semantics {
                 contentDescription = "ORIONセキュアアクセス"
-                stateDescription = uiState.accessibilityState()
+                stateDescription =  when (uiState) {
+                    AuthenticationUiState.Locked -> "システムロック中"
+                    AuthenticationUiState.Booting -> "セキュアブート中"
+                    is AuthenticationUiState.Authenticating -> "本人認証中"
+                    is AuthenticationUiState.Error -> "認証エラー: ${uiState.message}"
+                    AuthenticationUiState.AccessGranted -> "認証成功"
+                    AuthenticationUiState.Unlocked -> "ロック解除済み"
+                }
             },
     ) {
         Box(
@@ -426,7 +430,6 @@ private fun SecurityFooter(
             }
             CyberAction(
                 label = label,
-                modifier = Modifier.testTag(AUTHENTICATION_PRIMARY_ACTION_TAG),
                 onClick = when (uiState.recoveryAction) {
                     AuthenticationRecoveryAction.Retry -> onAuthenticationRequested
                     AuthenticationRecoveryAction.OpenSecuritySettings -> onOpenSecuritySettings
@@ -447,8 +450,15 @@ private fun CyberAction(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
-            .border(1.dp, OrionCyan, CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp))
-            .background(OrionPanel.copy(alpha = 0.94f), CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp))
+            .border(
+                1.dp,
+                OrionCyan,
+                CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp)
+            )
+            .background(
+                OrionPanel.copy(alpha = 0.94f),
+                CutCornerShape(topStart = 12.dp, bottomEnd = 12.dp)
+            )
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label }
             .padding(horizontal = 18.dp, vertical = 16.dp),
@@ -464,19 +474,7 @@ private fun CyberAction(
     }
 }
 
-private fun AuthenticationUiState.accessibilityState(): String = when (this) {
-    AuthenticationUiState.Locked -> "システムロック中"
-    AuthenticationUiState.Booting -> "セキュアブート中"
-    is AuthenticationUiState.Authenticating -> "本人認証中"
-    is AuthenticationUiState.Error -> "認証エラー: $message"
-    AuthenticationUiState.AccessGranted -> "認証成功"
-    AuthenticationUiState.Unlocked -> "ロック解除済み"
-}
-
-private const val BOOT_DURATION_MILLIS = 450
-private const val UNLOCK_DURATION_MILLIS = 900
-
-@Preview(showBackground = true, widthDp = 393, heightDp = 852)
+@Preview(showBackground = true)
 @Composable
 private fun AuthenticationBootPreview() {
     OrionTheme {
@@ -490,7 +488,7 @@ private fun AuthenticationBootPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 393, heightDp = 852)
+@Preview(showBackground = true)
 @Composable
 private fun AuthenticationErrorPreview() {
     OrionTheme {
@@ -508,7 +506,7 @@ private fun AuthenticationErrorPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 393, heightDp = 852)
+@Preview(showBackground = true)
 @Composable
 private fun AuthenticationGrantedPreview() {
     OrionTheme {

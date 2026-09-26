@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.intelligence
+package jp.hotdrop.orion.ui.intelligence.analysis
 
 import android.content.ClipData
 import android.content.ClipboardManager

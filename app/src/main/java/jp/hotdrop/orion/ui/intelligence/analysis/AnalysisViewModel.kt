@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.intelligence
+package jp.hotdrop.orion.ui.intelligence.analysis
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +7,7 @@ import javax.inject.Inject
 import jp.hotdrop.orion.data.SignalFocusRepository
 import jp.hotdrop.orion.model.intelligence.AnalysisDraft
 import jp.hotdrop.orion.model.intelligence.extractKeywordCandidates
+import jp.hotdrop.orion.ui.intelligence.reportIntelligenceFailure
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel

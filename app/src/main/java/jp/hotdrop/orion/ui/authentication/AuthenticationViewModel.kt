@@ -2,6 +2,9 @@ package jp.hotdrop.orion.ui.authentication
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.hotdrop.orion.ui.authentication.uistate.AuthenticationRecoveryAction
+import jp.hotdrop.orion.ui.authentication.uistate.AuthenticationUiState
+import jp.hotdrop.orion.ui.authentication.uistate.BiometricAuthenticationResult
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,23 +65,4 @@ class AuthenticationViewModel @Inject constructor() : ViewModel() {
             mutableUiState.value = AuthenticationUiState.Unlocked
         }
     }
-}
-
-sealed interface AuthenticationUiState {
-    data object Locked : AuthenticationUiState
-    data object Booting : AuthenticationUiState
-    data class Authenticating(val failedAttempts: Int = 0) : AuthenticationUiState
-
-    data class Error(
-        val title: String,
-        val message: String,
-        val recoveryAction: AuthenticationRecoveryAction,
-    ) : AuthenticationUiState
-    data object AccessGranted : AuthenticationUiState
-    data object Unlocked : AuthenticationUiState
-}
-
-enum class AuthenticationRecoveryAction {
-    Retry,
-    OpenSecuritySettings,
 }

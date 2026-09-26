@@ -1,4 +1,4 @@
-package jp.hotdrop.orion.ui.intelligence
+package jp.hotdrop.orion.ui.intelligence.analysis
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
