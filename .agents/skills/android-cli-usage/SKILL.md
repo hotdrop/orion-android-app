@@ -26,3 +26,11 @@ description: Decide whether and how to use Android CLI for ORION. Use for curren
 - バージョンは `android --version` で確認する。
 - SDKと環境は、必要な場合だけ `android info` で確認する。
 - sandbox外への書き込みやGUI操作が必要なら、実行前に承認を得る。
+
+## 端末確認と検証後の復元
+
+- エミュレータでの確認とStudio Previewの描画確認は同時に行わない。選択、切り替え、メモリ不足時のGradle実行は `.agents/skills/android-quality-gates/SKILL.md` に従う。
+- エミュレータの画面が黒い場合は、再起動する前に画面電源、端末ロック、ユーザーの解除状態を確認する。
+- 端末のユーザー解除前は、共有ストレージへのUI dump取得が失敗する場合がある。端末状態を切り分け、アプリ障害と断定しない。
+- 検証でPINや文字倍率などを変更する場合は、変更前の状態と復元方法を把握してから変更し、検証の成否にかかわらず終了時に元へ戻して確認する。PINなどの秘密値をログや作業記録に残さない。
+- 復元できない場合は、残った変更と復元できない理由を報告する。

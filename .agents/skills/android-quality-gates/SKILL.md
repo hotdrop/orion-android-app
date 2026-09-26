@@ -14,7 +14,7 @@ description: Select and run risk-based verification for ORION Android changes. U
 | Markdown・コメントのみ | リンク、表記、差分 | Androidビルドは不要 |
 | 純粋なロジック・変換 | 対象単体テスト、既存単体テスト | 境界値、失敗系、プロパティテスト |
 | ViewModel・状態変換 | 状態遷移または抽出した純粋ロジックの単体テスト | 再試行、キャンセル、復元、Flowの順序 |
-| Compose UI・Resource | Kotlinコンパイル、既存Previewまたは実行画面、主要状態 | 新規・大幅変更時のPreview追加、UIテスト、端末確認、アクセシビリティ確認 |
+| Compose UI・Resource | Kotlinコンパイル、変更対象UIの全表示状態のPreview実装、利用可能な環境でPreviewまたは実行画面の確認 | 端末確認、アクセシビリティ確認 |
 | Room・永続化 | DAOまたは移行テスト、既存単体テスト | アップグレード、破損、ロールバック確認 |
 | Google Drive・同期 | 変換、重複、競合、部分失敗のテスト | sandbox、認証失効、再試行、オフライン確認 |
 | Gradle・依存関係 | Sync相当の解決、Kotlinコンパイル、既存単体テスト | releaseビルド、R8、APKサイズ確認 |
@@ -25,12 +25,13 @@ description: Select and run risk-based verification for ORION Android changes. U
 - Model、変換、Repository、同期規則などの複雑なロジックを単体テストする。
 - ViewModelの分岐が単純なら過剰なモックテストを作らず、複雑な規則を純粋ロジックへ分離してテストする。
 - Roomのクエリ、制約、移行は実データベースを使うテストで確認する。
-- UIテストは、重要導線、回帰リスクの高い操作、セマンティクス保証に限定する。
-- UIの見た目はテストだけで保証せず、変更リスクと利用可能な環境に応じて既存Previewまたは実行画面を確認する。新規画面や大幅な変更では、可能なら両方を確認する。
+- UIテストは作成しない。AndroidTestはAndroidのContextが必要なビジネスロジックとRoomの処理を対象にする。
+- Previewコードの実装と描画確認を区別し、コードの存在やコンパイル成功だけで表示確認済みとしない。変更リスクと利用可能な環境に応じてStudio Previewまたは実行画面で見た目を確認する。
+- この開発環境ではメモリ不足を避けるため、エミュレータでの確認とStudio Previewの描画確認は一方を選び、同時実行しない。両方必要な場合は、先の検証を終えてエミュレータまたはPreview描画を停止してから次へ進む。
 
 ## 検証を実行する
 
-- 同一variantを触るタスクはキャッシュ競合を避けるため直列に実行する。
+- 同一variantを触るタスクはキャッシュ競合を避けるため直列に実行する。メモリ不足時はGradleに `--max-workers=1` を指定する。
 - Kotlin変更では、原則として `./gradlew :app:compileDebugKotlin` を先に実行する。
 - 単体テスト対象がある場合は、その後に `./gradlew :app:testDebugUnitTest` を実行する。
 - instrumentationや端末確認は、対象端末またはエミュレータが利用可能な場合に実行する。環境がなければ残存リスクとして報告して成果を渡し、実行確認が明示的な受け入れ条件なら環境の提供を依頼する。

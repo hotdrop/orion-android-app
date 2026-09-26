@@ -39,7 +39,9 @@ description: Design or modify ORION's Jetpack Compose UI, theme, custom componen
 
 ## UI変更を確認する
 
-- 新規作成または大きく変更する再利用可能なComposableと主要画面にPreviewを用意し、代表状態を個別に表示する。小さな変更では既存Previewを利用し、Preview新設だけを目的にスコープを広げない。
-- 通常、空、読み込み、エラー、長文、ユーザー編集済みなど変更に関係する状態を確認する。
+- 全てのUIにPreviewを実装し、取りうる全ての表示状態を表現する。UIを変更する際は既存Previewの網羅性も確認し、変更対象に不足する状態を補う。無関係な既存UI全体の改修へ作業を広げない。
+- Previewのアノテーション、関数、テーマ、対象UIをそれぞれ読み取れる書式にする。各Previewにテーマと対象UIを直接記述し、表示条件を明確にする。単に数行を省くための、テーマで包むだけの共通ラッパーを作らない。
+- 通常、空、読み込み、エラー、長文、ユーザー編集済みなど、そのUIが取りうる表示状態を洗い出し、Previewに対応させる。
+- Previewコードの実装と実際の描画確認を区別する。描画確認の方法と実行順序は `.agents/skills/android-quality-gates/SKILL.md` に従う。
 - 動きや描画性能を変更した場合はPreviewだけで完了せず、利用可能な実行環境で遷移、連打、スクロール、復帰を確認する。環境がない場合は未確認のリスクとして報告する。
 - `.agents/skills/android-quality-gates/SKILL.md` から変更リスクに合う検証を選ぶ。

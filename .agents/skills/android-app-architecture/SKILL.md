@@ -7,7 +7,7 @@ description: Design or modify ORION's Android architecture, Activity and Composa
 
 ## 現状を確認する
 
-- 仕様がREADMEにない場合は、実装で仕様を創作せず、必要な判断をユーザーへ確認する。
+- 仕様は `docs/DesignDoc.md`、README、関連実装を確認し、要件と現在の挙動を把握する。未決定の要件だけをユーザーへ確認し、実装で仕様を創作しない。プロダクト要件の変更は先にDesignDocへ反映する。
 
 ## 基本原則
 
@@ -22,6 +22,7 @@ description: Design or modify ORION's Android architecture, Activity and Composa
 - Compose UIを状態とイベントの入出力として設計し、単方向データフローを保つ。
 - ライフサイクルを越えて状態を保持する必要がある画面ではViewModelを使い、永続化や外部SDKの詳細をComposableへ置かない。
 - UseCaseは、複数画面で再利用する処理、複数データ源を調停する処理、独立して検証すべき複雑なルールにだけ導入する。
+- 共通化や抽出には具体的な責務と必要性を求める。重複や行数の削減だけを理由にせず、呼び出し元と定義を往復する負担も含めて判断する。
 - interfaceと実装クラスを機械的に対で作らない。外部サービス境界、端末機能境界、テスト差し替えなど明確な理由がある場所だけ抽象化する。
 
 ## UI実装の所有境界を先に決める
@@ -52,7 +53,7 @@ description: Design or modify ORION's Android architecture, Activity and Composa
 
 - UI、状態管理、永続化、外部連携の所有境界を説明できる。
 - Activityや単一Composableへ異なる責務が集中していないことを差分で確認している。
-- 新規画面では、`.agents/skills/orion-ui-experience/SKILL.md` のPreview要件と `.agents/skills/android-quality-gates/SKILL.md` の主要導線テスト要件を満たしている。
+- 新規画面では、`.agents/skills/orion-ui-experience/SKILL.md` のPreview要件と `.agents/skills/android-quality-gates/SKILL.md` の変更リスクに応じた検証要件を満たしている。
 - ローカルデータの正本と同期時のユーザー編集値の扱いが明確である。
 - 不要なレイヤー、interface、モジュール、依存関係を増やしていない。
 - エラーのユーザー表示、再試行、内部診断を混同していない。

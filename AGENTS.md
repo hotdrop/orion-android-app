@@ -11,16 +11,19 @@
 ## 作業原則
 
 - 小さく実装し、抽象化、モジュール分割、新規ライブラリは具体的な必要性が生じてから追加する。
+- 実装前に同じ責務を持つコミット済みコードを確認し、改行、空行、引数の渡し方、関数の構成を合わせる。行数の少なさを品質とみなさない。
+- 複数の処理やcatch節を1行へ詰め込まない。長い引数列は1引数1行にし、Booleanや同型の値、複数のコールバックには名前付き引数を使う。連続する変換やModifierのチェーンは処理単位で改行する。
+- 主要なクラス・関数にはKDocを付け、責務、入出力の意味、重要な制約を説明する。保存範囲、失敗時の扱い、キャンセル、同時実行制御は理由を記し、関数名の言い換えや自明な行ごとの説明は増やさない。
 - `const val` の名前は大文字のスネークケース（例: `DATABASE_NAME`）にする。
 - `docs/DesignDoc.md` を実装とともに育てる概要設計書として扱う。機能や画面を追加、変更、削除する場合は、同じ作業内で実際の機能、ユーザー操作、画面構成を反映し、設計書の更新までを完了条件とする。
 - プロダクト要件が変わる場合は先に `docs/DesignDoc.md` を整合させる。設計書には実装コード、データモデル、クラス構成などの詳細設計を持ち込まず、「どんな機能があり、何をするか」を簡潔に保つ。
 - 変更リスクに応じて検証し、実行した確認と未実施の確認を最終報告へ簡潔に記載する。
-- UIテストは作成しないでください。AndroidTestではAndroidのContextが必要なビジネスロジックやRoomの処理とします。ただし必ずUIはPreviewを実装しましょう。全てのUIは取りうる全ての状態をPreviewで表現してください。
+- UIテストは作成しない。AndroidTestはAndroidのContextが必要なビジネスロジックとRoomの処理を対象にする。全てのUIにPreviewを実装し、取りうる全ての表示状態を表現する。
 
 ## スキル利用
 
 - 新規画面構成、Activity・Composableの責務分割、Navigation、状態管理、パッケージ構成、データ境界、Room、Google Drive連携、DI、モジュール構成を扱う場合は `.agents/skills/android-app-architecture/SKILL.md` を読む。
 - Compose UI、テーマ、Canvas、アニメーション、サウンド、触覚、アクセシビリティ、描画性能を扱う場合は `.agents/skills/orion-ui-experience/SKILL.md` を読む。
-- Androidのコードやビルド設定を変更する場合は `.agents/kills/android-quality-gates/SKILL.md` を読み、リスクに合う検証を行う。
+- Androidのコードやビルド設定を変更する場合は `.agents/skills/android-quality-gates/SKILL.md` を読み、リスクに合う検証を行う。
 - 最新Android仕様、SDK、エミュレータ、実行、画面・レイアウト調査、Android Studio連携が必要な場合だけ `.agents/skills/android-cli-usage/SKILL.md` を読む。コマンド仕様が必要なら汎用 `android-cli` スキルも読む。
 - 開発中に再利用可能な改善点を発見した場合だけ `.agents/skills/feedback-loop/SKILL.md` を読み、`task/Feedback.md` へ記録する。
