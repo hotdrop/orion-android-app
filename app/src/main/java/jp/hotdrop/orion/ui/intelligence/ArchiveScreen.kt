@@ -120,6 +120,7 @@ fun ArchiveScreen(
                         keywords = signal.keywords,
                         onOpen = { onSignal(signal.id) },
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     state.archive.links
                         .filter { it.signalId == signal.id }
                         .forEach { link ->
