@@ -54,8 +54,15 @@ fun IncomingIntelligenceDocumentCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, signalColor.copy(alpha = 0.8f), IncomingDocumentCardShape)
-            .background(OrionPanelElevated.copy(alpha = 0.55f), IncomingDocumentCardShape)
+            .border(
+                1.dp,
+                signalColor.copy(alpha = 0.8f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
+            .background(
+                OrionPanelElevated.copy(alpha = 0.55f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
             .padding(16.dp),
     ) {
         Row(
@@ -111,8 +118,6 @@ fun IncomingIntelligenceDocumentCard(
     }
 }
 
-private val IncomingDocumentCardShape = CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
-
 @Preview
 @Composable
 private fun IncomingIntelligenceDocumentCardNewPreview() {
@@ -139,26 +144,32 @@ private fun IncomingIntelligenceDocumentCardCachedPreview() {
     }
 }
 
-@Preview(name = "Marked / short note", widthDp = 360)
+@Preview(name = "Marked / short note")
 @Composable
 private fun IncomingDocumentMarkedPreview() {
     OrionTheme {
         IncomingIntelligenceDocumentCard(
-            title = "Compose Rendering Report", updatedAtLabel = "09/05 12:30", isNew = false,
-            onClick = {}, isFavorite = true, memo = "次の実装で参照する。",
+            title = "Compose Rendering Report",
+            updatedAtLabel = "09/05 12:30",
+            isNew = false,
+            onClick = {},
+            isFavorite = true,
+            memo = "次の実装で参照する。"
         )
     }
 }
 
-@Preview(name = "Long note / motion disabled", widthDp = 360)
-@Preview(name = "Large text / narrow card", widthDp = 320, fontScale = 2f)
+@Preview(name = "Long note / motion disabled")
 @Composable
 private fun IncomingDocumentLongNotePreview() {
     OrionTheme {
         IncomingIntelligenceDocumentCard(
             title = "Jetpack Composeの描画パフォーマンスを安定させるための実践ガイド",
-            updatedAtLabel = "09/05 12:30", isNew = true, onClick = {}, isFavorite = true,
-            memo = "再コンポーズの測定方法と改善の手順を調査する。\n\n描画処理を分離する。\n実機でフレーム時間を確認する。",
+            updatedAtLabel = "09/05 12:30",
+            isNew = true,
+            onClick = {},
+            isFavorite = true,
+            memo = "再コンポーズの測定方法と改善の手順を調査する。\n\n描画処理を分離する。\n実機でフレーム時間を確認する。"
         )
     }
 }

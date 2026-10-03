@@ -37,7 +37,7 @@ fun IncomingIntelligenceDriveNotConfigured(
     modifier: Modifier = Modifier,
 ) {
     IncomingIntelligenceEmptyPanel(
-        code = "DRIVE TARGET // NOT CONFIGURED",
+        code = "DRIVE TARGET NOT CONFIGURED",
         message = "SettingsでGoogle Driveの対象フォルダを設定してください。",
         toneColor = OrionAmber,
         modifier = modifier,
@@ -53,7 +53,7 @@ fun IncomingIntelligenceDriveNotConfigured(
 @Composable
 fun IncomingIntelligenceInitialSync(modifier: Modifier = Modifier) {
     IncomingIntelligenceEmptyPanel(
-        code = "SIGNAL SCAN // IN PROGRESS",
+        code = "SIGNAL SCAN IN PROGRESS",
         message = "Google Driveから技術情報を取得しています。",
         toneColor = OrionCyan,
         modifier = modifier,
@@ -92,8 +92,15 @@ private fun IncomingIntelligenceEmptyPanel(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .border(1.dp, toneColor.copy(alpha = 0.65f), IncomingEmptyStateShape)
-            .background(OrionPanelElevated.copy(alpha = 0.35f), IncomingEmptyStateShape)
+            .border(
+                1.dp,
+                toneColor.copy(alpha = 0.65f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
+            .background(
+                OrionPanelElevated.copy(alpha = 0.35f),
+                CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
+            )
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -126,7 +133,11 @@ private fun IncomingIntelligenceOutlineAction(
     Box(
         modifier = modifier
             .heightIn(min = 48.dp)
-            .border(1.dp, OrionCyan, IncomingEmptyActionShape)
+            .border(
+                1.dp,
+                OrionCyan,
+                CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
+            )
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = accessibilityLabel }
             .padding(horizontal = 18.dp),
@@ -142,25 +153,32 @@ private fun IncomingIntelligenceOutlineAction(
     }
 }
 
-private val IncomingEmptyStateShape = CutCornerShape(topStart = 14.dp, bottomEnd = 14.dp)
-private val IncomingEmptyActionShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
-
 @Preview
 @Composable
 private fun IncomingIntelligenceDriveNotConfiguredPreview() {
-    OrionTheme { IncomingIntelligenceDriveNotConfigured(onOpenSettings = {}) }
+    OrionTheme {
+        IncomingIntelligenceDriveNotConfigured(
+            onOpenSettings = {}
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun IncomingIntelligenceInitialSyncPreview() {
-    OrionTheme { IncomingIntelligenceInitialSync() }
+    OrionTheme {
+        IncomingIntelligenceInitialSync()
+    }
 }
 
 @Preview
 @Composable
 private fun IncomingIntelligenceNoDocumentsPreview() {
-    OrionTheme { IncomingIntelligenceNoDocuments(onSync = {}) }
+    OrionTheme {
+        IncomingIntelligenceNoDocuments(
+            onSync = {}
+        )
+    }
 }
 
 @Preview
@@ -168,7 +186,7 @@ private fun IncomingIntelligenceNoDocumentsPreview() {
 private fun IncomingIntelligenceEmptyPanelPreview() {
     OrionTheme {
         IncomingIntelligenceEmptyPanel(
-            code = "EMPTY STATE // PREVIEW",
+            code = "EMPTY STATE PREVIEW",
             message = "代表的な空状態の表示です。",
             toneColor = OrionAmber,
         ) {

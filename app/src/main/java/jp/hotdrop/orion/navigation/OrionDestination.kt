@@ -1,25 +1,15 @@
 package jp.hotdrop.orion.navigation
 
 import android.net.Uri
+
 enum class OrionTopLevelDestination(
     val route: String,
     val title: String,
     val navigationLabel: String,
     val code: String,
 ) {
-    Incoming(
-        route = "incoming",
-        title = "INCOMING INTELLIGENCE",
-        navigationLabel = "INCOMING",
-        code = "IN",
-    ),
-    Archive(
-        route = "archive",
-        title = "KNOWLEDGE ARCHIVE",
-        navigationLabel = "ARCHIVE",
-        code = "KA",
-    ),
-    ;
+    Incoming(route = "incoming", title = "INCOMING INTELLIGENCE", navigationLabel = "INCOMING", code = "IN"),
+    Archive(route = "archive", title = "PERSONAL INTELLIGENCE", navigationLabel = "ARCHIVE", code = "PI");
 
     companion object {
         fun fromRoute(route: String?): OrionTopLevelDestination? =
@@ -34,11 +24,10 @@ object OrionDestination {
 
     const val SETTINGS_ROUTE = "settings"
     const val SETTINGS_TITLE = "SYSTEM SETTINGS"
-    const val ARCHIVE_NEW_ROUTE = "archive/new"
-    const val ARCHIVE_EDIT_ROUTE = "archive/edit/{entryId}"
-    const val ARCHIVE_ENTRY_ID_ARGUMENT = "entryId"
-    const val ARCHIVE_NEW_TITLE = "NEW KNOWLEDGE RECORD"
-    const val ARCHIVE_EDIT_TITLE = "EDIT KNOWLEDGE RECORD"
+    const val RECORD_DETAIL_ROUTE = "archive/{kind}/detail/{recordId}"
+    const val RECORD_EDIT_ROUTE = "archive/{kind}/edit/{recordId}"
+    const val ANALYSIS_ROUTE = "archive/analysis"
 
-    fun archiveEditRoute(entryId: Long): String = "archive/edit/$entryId"
+    fun recordDetailRoute(kind: String, id: Long): String = "archive/$kind/detail/$id"
+    fun recordEditRoute(kind: String, id: Long): String = "archive/$kind/edit/$id"
 }

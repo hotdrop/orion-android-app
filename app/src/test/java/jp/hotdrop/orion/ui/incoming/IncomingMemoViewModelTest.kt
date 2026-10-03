@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import jp.hotdrop.orion.data.FakeIncomingPersonalDao
 import jp.hotdrop.orion.data.IncomingPersonalRepository
 import jp.hotdrop.orion.navigation.OrionDestination
+import jp.hotdrop.orion.ui.incoming.memo.IncomingMemoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

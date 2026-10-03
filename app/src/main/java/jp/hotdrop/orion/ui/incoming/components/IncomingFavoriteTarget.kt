@@ -40,20 +40,29 @@ internal fun IncomingFavoriteTarget(
     val capture = remember { Animatable(if (isFavorite) 1f else 0f) }
     val flash = remember { Animatable(0f) }
     val durationScale = rememberCoroutineScope().coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f
+
     LaunchedEffect(isFavorite, playbackEnabled, durationScale) {
         flash.snapTo(0f)
         val target = if (isFavorite) 1f else 0f
         if (!playbackEnabled || durationScale == 0f) {
             capture.snapTo(target)
         } else if (capture.value != target) {
-            capture.animateTo(target, tween(if (isFavorite) CAPTURE_MILLIS else RELEASE_MILLIS))
+            capture.animateTo(
+                targetValue = target,
+                animationSpec = tween(if (isFavorite) 300 else 200))
             if (isFavorite) {
                 flash.snapTo(1f)
-                flash.animateTo(0f, tween(FLASH_MILLIS))
+                flash.animateTo(0f, tween(160))
             }
         }
     }
-    FavoriteTargetContent(title, isFavorite, { capture.value }, { flash.value }, onToggle)
+    FavoriteTargetContent(
+        title = title,
+        isFavorite = isFavorite,
+        capture = { capture.value },
+        flash = { flash.value },
+        onToggle = onToggle
+    )
 }
 
 @Composable
@@ -67,7 +76,11 @@ private fun FavoriteTargetContent(
     Column(
         modifier = Modifier
             .widthIn(min = 76.dp)
-            .toggleable(value = isFavorite, role = Role.Checkbox, onValueChange = { onToggle() })
+            .toggleable(
+                value = isFavorite,
+                role = Role.Checkbox,
+                onValueChange = { onToggle() }
+            )
             .semantics {
                 contentDescription = "${title}のお気に入りを切り替え"
                 stateDescription = if (isFavorite) "登録済み" else "未登録"
@@ -107,36 +120,44 @@ private fun FavoriteTargetContent(
     }
 }
 
-private const val CAPTURE_MILLIS = 300
-private const val RELEASE_MILLIS = 200
-private const val FLASH_MILLIS = 160
-
 @Preview(name = "Target / unmarked")
 @Composable
 private fun FavoriteTargetIdlePreview() {
-    OrionTheme { FavoriteTargetContent("資料", false, { 0f }, { 0f }, {}) }
-}
-
-@Preview(name = "Target / capturing")
-@Composable
-private fun FavoriteTargetCapturingPreview() {
-    OrionTheme { FavoriteTargetContent("資料", true, { 0.5f }, { 0f }, {}) }
-}
-
-@Preview(name = "Target / captured flash")
-@Composable
-private fun FavoriteTargetFlashPreview() {
-    OrionTheme { FavoriteTargetContent("資料", true, { 1f }, { 1f }, {}) }
+    OrionTheme {
+        FavoriteTargetContent(
+            "資料",
+            false,
+            { 0f },
+            { 0f },
+            {}
+        )
+    }
 }
 
 @Preview(name = "Target / marked")
 @Composable
 private fun FavoriteTargetMarkedPreview() {
-    OrionTheme { FavoriteTargetContent("資料", true, { 1f }, { 0f }, {}) }
+    OrionTheme {
+        FavoriteTargetContent(
+            "資料",
+            true,
+            { 1f },
+            { 0f },
+            {}
+        )
+    }
 }
 
 @Preview(name = "Target / releasing")
 @Composable
 private fun FavoriteTargetReleasingPreview() {
-    OrionTheme { FavoriteTargetContent("資料", false, { 0.5f }, { 0f }, {}) }
+    OrionTheme {
+        FavoriteTargetContent(
+            "資料",
+            false,
+            { 0.5f },
+            { 0f },
+            {}
+        )
+    }
 }

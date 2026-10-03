@@ -24,7 +24,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -37,8 +36,6 @@ import jp.hotdrop.orion.ui.theme.OrionCyanMuted
 import jp.hotdrop.orion.ui.theme.OrionTextMuted
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
-internal const val IncomingSyncButtonTag = "incoming_sync_button"
-
 @Composable
 fun IncomingIntelligenceHeader(
     lastSyncedAtLabel: String?,
@@ -50,7 +47,7 @@ fun IncomingIntelligenceHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = SyncReactorSize),
+            .heightIn(min = 76.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -87,14 +84,13 @@ private fun IncomingSyncReactor(
 
     Box(
         modifier = modifier
-            .size(SyncReactorSize)
+            .size(76.dp)
             .clip(CircleShape)
             .clickable(
                 enabled = enabled,
                 role = Role.Button,
                 onClick = onClick,
             )
-            .testTag(IncomingSyncButtonTag)
             .semantics { contentDescription = "Incoming Intelligenceを同期" },
         contentAlignment = Alignment.Center,
     ) {
@@ -145,7 +141,7 @@ private fun SyncReactorRings(
             center = center,
             style = Stroke(width = 1.dp.toPx()),
         )
-        for (startAngle in SyncReactorArcStartAngles) {
+        for (startAngle in floatArrayOf(-82f, 8f, 98f, 188f)) {
             drawArc(
                 color = color.copy(alpha = alpha),
                 startAngle = startAngle,
@@ -171,9 +167,6 @@ private fun SyncReactorRings(
         )
     }
 }
-
-private val SyncReactorSize = 76.dp
-private val SyncReactorArcStartAngles = floatArrayOf(-82f, 8f, 98f, 188f)
 
 @Preview
 @Composable

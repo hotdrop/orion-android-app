@@ -11,14 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.AuthorizationResult
 import jp.hotdrop.orion.data.remote.GoogleDriveAuthorizationClient
 
-sealed interface GoogleDriveAuthorizationResult {
-    data class Authorized(val accessToken: String) : GoogleDriveAuthorizationResult
-
-    data object Cancelled : GoogleDriveAuthorizationResult
-
-    data class Failed(val cause: Throwable) : GoogleDriveAuthorizationResult
-}
-
 @Composable
 fun rememberGoogleDriveAuthorization(
     onResult: (GoogleDriveAuthorizationResult) -> Unit,
@@ -79,4 +71,10 @@ fun rememberGoogleDriveAuthorization(
                 .addOnFailureListener { deliver(GoogleDriveAuthorizationResult.Failed(it)) }
         }
     }
+}
+
+sealed interface GoogleDriveAuthorizationResult {
+    data class Authorized(val accessToken: String) : GoogleDriveAuthorizationResult
+    data object Cancelled : GoogleDriveAuthorizationResult
+    data class Failed(val cause: Throwable) : GoogleDriveAuthorizationResult
 }

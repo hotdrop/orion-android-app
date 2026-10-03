@@ -14,7 +14,7 @@ import jp.hotdrop.orion.ui.OrionRoot
 import jp.hotdrop.orion.ui.authentication.AndroidBiometricAuthenticator
 import jp.hotdrop.orion.ui.authentication.AuthenticationViewModel
 import jp.hotdrop.orion.ui.authentication.BiometricAuthenticator
-import jp.hotdrop.orion.ui.authentication.OrionSecureRoot
+import jp.hotdrop.orion.ui.authentication.OrionSecureScreen
 import jp.hotdrop.orion.ui.theme.OrionTheme
 
 @AndroidEntryPoint
@@ -36,7 +36,7 @@ class MainActivity : FragmentActivity() {
             val authenticationUiState by authenticationViewModel.uiState.collectAsStateWithLifecycle()
 
             OrionTheme {
-                OrionSecureRoot(
+                OrionSecureScreen(
                     uiState = authenticationUiState,
                     onAuthenticationRequested = {
                         if (authenticationViewModel.requestAuthentication()) {
